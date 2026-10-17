@@ -1,4 +1,4 @@
-package kh.edu.rupp.rupp_payment_systerm_backend;
+package com.rupp.payment;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
