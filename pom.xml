@@ -8,7 +8,7 @@
         <version>4.1.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>kh.edu.rupp</groupId>
+    <groupId>com.rupp.payment</groupId>
     <artifactId>RUPP_Payment_Systerm_Backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>RUPP_Payment_Systerm_Backend</name>
