@@ -55,7 +55,7 @@ public class DataInitializer implements CommandLineRunner {
         // 1. Seed Faculties
         Faculty csFaculty = facultyRepository.findByFacultyName("Computer Science")
                 .orElseGet(() -> facultyRepository.save(new Faculty("Computer Science", "Faculty of Science")));
-        facultyRepository.findByFacultyName("Telecommunication Engineering")
+        Faculty teFaculty = facultyRepository.findByFacultyName("Telecommunication Engineering")
                 .orElseGet(() -> facultyRepository.save(new Faculty("Telecommunication Engineering", "Faculty of Engineering")));
         Faculty itFaculty = facultyRepository.findByFacultyName("Information Technology Engineering")
                 .orElseGet(() -> facultyRepository.save(new Faculty("Information Technology Engineering", "Faculty of Engineering")));
@@ -75,25 +75,26 @@ public class DataInitializer implements CommandLineRunner {
                 .orElseGet(() -> academicYearRepository.save(
                         new AcademicYear("2025-2026", LocalDate.of(2025, 10, 1), LocalDate.of(2026, 7, 31))));
 
-<<<<<<< HEAD
-        // 3. Seed Admin User
-=======
-        // Seed Majors if none exist
+        // 3. Seed Majors if none exist
         if (majorRepository.count() == 0) {
             majorRepository.save(new Major("Computer Science", "CS", csFaculty, "Department of Computer Science"));
             majorRepository.save(new Major("Information Technology Engineering", "ITE", teFaculty, "Department of Telecom & IT"));
             logger.info("Default Majors created: CS, ITE");
         }
 
-        // Seed Semesters if none exist
+        Major csMajor = majorRepository.findByMajorCode("CS")
+                .orElseGet(() -> majorRepository.save(new Major("Computer Science", "CS", csFaculty, "Department of Computer Science")));
+        Major iteMajor = majorRepository.findByMajorCode("ITE")
+                .orElseGet(() -> majorRepository.save(new Major("Information Technology Engineering", "ITE", teFaculty, "Department of Telecom & IT")));
+
+        // 4. Seed Semesters if none exist
         if (semesterRepository.count() == 0) {
             semesterRepository.save(new Semester("Semester 1", 1, year2025, LocalDate.of(2024, 10, 1), LocalDate.of(2025, 2, 28), true));
             semesterRepository.save(new Semester("Semester 2", 2, year2025, LocalDate.of(2025, 3, 1), LocalDate.of(2025, 7, 31), false));
             logger.info("Default Semesters created for 2024-2025: Semester 1 (Active), Semester 2");
         }
 
-        // Seed Admin User
->>>>>>> origin/feature/academic-structure-crud
+        // 5. Seed Admin User
         if (!userRepository.existsByUsername("admin")) {
             User admin = new User();
             admin.setUsername("admin");
@@ -104,7 +105,7 @@ public class DataInitializer implements CommandLineRunner {
             logger.info("Default ADMIN user created: admin / admin123");
         }
 
-        // 4. Seed Finance Staff Users
+        // 6. Seed Finance Staff Users
         if (!userRepository.existsByUsername("finance")) {
             User finance = new User();
             finance.setUsername("finance");
@@ -115,7 +116,6 @@ public class DataInitializer implements CommandLineRunner {
             logger.info("Default FINANCE_STAFF user created: finance / finance123");
         }
 
-<<<<<<< HEAD
         if (!userRepository.existsByUsername("accountant")) {
             User accountant = new User();
             accountant.setUsername("accountant");
@@ -126,29 +126,23 @@ public class DataInitializer implements CommandLineRunner {
             logger.info("Secondary FINANCE_STAFF user created: accountant / finance123");
         }
 
-        // 5. Seed Legacy student1
-=======
-        Major csMajor = majorRepository.findByMajorCode("CS")
-                .orElseGet(() -> majorRepository.save(new Major("Computer Science", "CS", csFaculty, "Department of Computer Science")));
-
-        // Seed Student User and Student Profile
->>>>>>> origin/feature/academic-structure-crud
+        // 7. Seed Legacy student1
         if (!userRepository.existsByUsername("student1")) {
-            seedStudentUser("student1", "student1@rupp.edu.kh", "student123", "Dara", "Nhim", csFaculty, year2025);
+            seedStudentUser("student1", "student1@rupp.edu.kh", "student123", "Dara", "Nhim", csFaculty, year2025, csMajor);
         }
 
-        // 6. Seed All 6 Team Members as Students
-        seedStudentUser("dara_nhim", "dara@rupp.edu.kh", "student123", "Dara", "Nhim", csFaculty, year2025);
-        seedStudentUser("leangkhai", "leangkhai@rupp.edu.kh", "student123", "Leangkhai", "Taing", teFaculty, year2025);
-        seedStudentUser("ayutaya", "ayutaya@rupp.edu.kh", "student123", "Ayutaya", "Tab", csFaculty, year2025);
-        seedStudentUser("chhuntheang", "chhuntheang@rupp.edu.kh", "student123", "Chhuntheang", "Thorn", itFaculty, year2025);
-        seedStudentUser("chihong", "chihong@rupp.edu.kh", "student123", "Chihong", "Tang", csFaculty, year2025);
-        seedStudentUser("vannsonleng", "vannsonleng@rupp.edu.kh", "student123", "Vannsonleng", "Nuon", teFaculty, year2025);
+        // 8. Seed All 6 Team Members as Students
+        seedStudentUser("dara_nhim", "dara@rupp.edu.kh", "student123", "Dara", "Nhim", csFaculty, year2025, csMajor);
+        seedStudentUser("leangkhai", "leangkhai@rupp.edu.kh", "student123", "Leangkhai", "Taing", teFaculty, year2025, iteMajor);
+        seedStudentUser("ayutaya", "ayutaya@rupp.edu.kh", "student123", "Ayutaya", "Tab", csFaculty, year2025, csMajor);
+        seedStudentUser("chhuntheang", "chhuntheang@rupp.edu.kh", "student123", "Chhuntheang", "Thorn", itFaculty, year2025, iteMajor);
+        seedStudentUser("chihong", "chihong@rupp.edu.kh", "student123", "Chihong", "Tang", csFaculty, year2025, csMajor);
+        seedStudentUser("vannsonleng", "vannsonleng@rupp.edu.kh", "student123", "Vannsonleng", "Nuon", teFaculty, year2025, iteMajor);
     }
 
     private void seedStudentUser(String username, String email, String rawPassword,
                                  String firstName, String lastName,
-                                 Faculty faculty, AcademicYear academicYear) {
+                                 Faculty faculty, AcademicYear academicYear, Major major) {
         if (!userRepository.existsByUsername(username)) {
             User studentUser = new User();
             studentUser.setUsername(username);
@@ -159,18 +153,11 @@ public class DataInitializer implements CommandLineRunner {
 
             Student student = new Student();
             student.setUser(savedUser);
-<<<<<<< HEAD
             student.setFirstName(firstName);
             student.setLastName(lastName);
             student.setFaculty(faculty);
             student.setAcademicYear(academicYear);
-=======
-            student.setFirstName("Dara");
-            student.setLastName("Nhim");
-            student.setFaculty(csFaculty);
-            student.setAcademicYear(year2025);
-            student.setMajor(csMajor);
->>>>>>> origin/feature/academic-structure-crud
+            student.setMajor(major);
             studentRepository.save(student);
 
             logger.info("Seeded Student User: {} ({} {})", username, firstName, lastName);

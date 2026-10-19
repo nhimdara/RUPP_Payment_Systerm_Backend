@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -76,7 +77,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-<<<<<<< HEAD
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleConstraintViolation(ConstraintViolationException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -113,41 +113,26 @@ public class GlobalExceptionHandler {
                 ex.getSupportedHttpMethods());
         logger.warn("Method not supported: {}", message);
         return new ResponseEntity<>(ApiResponse.error(message), HttpStatus.METHOD_NOT_ALLOWED);
-=======
-    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiResponse<Void>> handleTypeMismatchException(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex) {
-        String paramName = ex.getName();
-        String requiredType = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown";
-        String message = String.format("Invalid value '%s' for parameter '%s'. Expected type: %s", ex.getValue(), paramName, requiredType);
-        return new ResponseEntity<>(ApiResponse.error(message), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadable(org.springframework.http.converter.HttpMessageNotReadableException ex) {
-        return new ResponseEntity<>(ApiResponse.error("Malformed JSON request or invalid data format"), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolation(org.springframework.dao.DataIntegrityViolationException ex) {
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        logger.warn("Database constraint error: {}", ex.getMessage());
         return new ResponseEntity<>(ApiResponse.error("Database constraint error: record is referenced by other data or violates a unique constraint"), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
+        logger.warn("Illegal argument: {}", ex.getMessage());
         return new ResponseEntity<>(ApiResponse.error(ex.getMessage()), HttpStatus.BAD_REQUEST);
->>>>>>> origin/feature/academic-structure-crud
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception ex) {
-<<<<<<< HEAD
         logger.error("Unhandled internal server error: ", ex);
         return new ResponseEntity<>(
-                ApiResponse.error("An unexpected internal error occurred. Please contact the system administrator."),
+                ApiResponse.error("An unexpected error occurred: " + (ex.getMessage() != null ? ex.getMessage() : "Unknown error")),
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
-=======
-        return new ResponseEntity<>(ApiResponse.error("An unexpected error occurred: " + ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
->>>>>>> origin/feature/academic-structure-crud
     }
 }

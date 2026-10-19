@@ -52,22 +52,14 @@ public class UserService {
 
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
-<<<<<<< HEAD
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new DuplicateResourceException("Username '" + request.getUsername() + "' is already taken");
-        }
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("Email '" + request.getEmail() + "' is already in use");
-=======
         String username = request.getUsername().trim();
         String email = request.getEmail().trim().toLowerCase();
 
         if (userRepository.existsByUsername(username)) {
-            throw new BadRequestException("Username is already taken");
+            throw new DuplicateResourceException("Username '" + username + "' is already taken");
         }
         if (userRepository.existsByEmail(email)) {
-            throw new BadRequestException("Email is already in use");
->>>>>>> origin/feature/academic-structure-crud
+            throw new DuplicateResourceException("Email '" + email + "' is already in use");
         }
 
         User user = new User();

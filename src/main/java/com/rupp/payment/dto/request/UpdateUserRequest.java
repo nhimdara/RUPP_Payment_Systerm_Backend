@@ -12,11 +12,7 @@ public class UpdateUserRequest {
     @Email(message = "Email should be valid")
     private String email;
 
-<<<<<<< HEAD
     @Size(min = 6, message = "Password must have at least 6 characters")
-=======
-    @jakarta.validation.constraints.Size(min = 6, message = "Password must have at least 6 characters")
->>>>>>> origin/feature/academic-structure-crud
     private String password;
 
     private Role role;

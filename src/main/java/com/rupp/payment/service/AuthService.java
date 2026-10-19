@@ -56,24 +56,15 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-<<<<<<< HEAD
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new DuplicateResourceException("Username '" + request.getUsername() + "' is already taken");
-        }
-
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("Email '" + request.getEmail() + "' is already in use");
-=======
         String normalizedUsername = request.getUsername().trim();
         String normalizedEmail = request.getEmail().trim().toLowerCase();
 
         if (userRepository.existsByUsername(normalizedUsername)) {
-            throw new BadRequestException("Username is already taken");
+            throw new DuplicateResourceException("Username '" + normalizedUsername + "' is already taken");
         }
 
         if (userRepository.existsByEmail(normalizedEmail)) {
-            throw new BadRequestException("Email is already in use");
->>>>>>> origin/feature/academic-structure-crud
+            throw new DuplicateResourceException("Email '" + normalizedEmail + "' is already in use");
         }
 
         // Public registration always assigns ROLE_STUDENT to prevent privilege escalation.
