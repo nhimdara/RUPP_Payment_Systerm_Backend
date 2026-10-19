@@ -67,6 +67,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/students/my-profile").authenticated()
                         // Student management: Admin and Finance Staff
                         .requestMatchers("/api/v1/students/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_FINANCE_STAFF")
+                        // Academic Structure: Read is open to all authenticated users; CUD requires Admin/Finance Staff
+                        .requestMatchers(HttpMethod.GET, "/api/v1/faculties/**", "/api/v1/academic-years/**", "/api/v1/majors/**", "/api/v1/semesters/**").authenticated()
+                        .requestMatchers("/api/v1/academic-years/**", "/api/v1/majors/**", "/api/v1/semesters/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_FINANCE_STAFF")
                         // User management: Admin only
                         .requestMatchers("/api/v1/users/**").hasAuthority("ROLE_ADMIN")
                         // All other requests require authentication

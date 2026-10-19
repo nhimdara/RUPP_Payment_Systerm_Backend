@@ -11,15 +11,17 @@ public class UpdateStudentRequest {
     private String lastName;
     private Long facultyId;
     private Long academicYearId;
+    private Long majorId;
 
     public UpdateStudentRequest() {
     }
 
-    public UpdateStudentRequest(String firstName, String lastName, Long facultyId, Long academicYearId) {
+    public UpdateStudentRequest(String firstName, String lastName, Long facultyId, Long academicYearId, Long majorId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.facultyId = facultyId;
         this.academicYearId = academicYearId;
+        this.majorId = majorId;
     }
 
     public String getFirstName() {
@@ -52,5 +54,13 @@ public class UpdateStudentRequest {
 
     public void setAcademicYearId(Long academicYearId) {
         this.academicYearId = academicYearId;
+    }
+
+    public Long getMajorId() {
+        return majorId;
+    }
+
+    public void setMajorId(Long majorId) {
+        this.majorId = majorId;
     }
 }

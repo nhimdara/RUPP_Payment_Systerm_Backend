@@ -27,21 +27,26 @@ public class StudentService {
     private final UserRepository userRepository;
     private final FacultyRepository facultyRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final com.rupp.payment.repository.MajorRepository majorRepository;
 
     public StudentService(StudentRepository studentRepository,
                           UserRepository userRepository,
                           FacultyRepository facultyRepository,
-                          AcademicYearRepository academicYearRepository) {
+                          AcademicYearRepository academicYearRepository,
+                          com.rupp.payment.repository.MajorRepository majorRepository) {
         this.studentRepository = studentRepository;
         this.userRepository = userRepository;
         this.facultyRepository = facultyRepository;
         this.academicYearRepository = academicYearRepository;
+        this.majorRepository = majorRepository;
     }
 
     @Transactional(readOnly = true)
-    public List<StudentResponse> getAllStudents(Long facultyId, Long academicYearId) {
+    public List<StudentResponse> getAllStudents(Long facultyId, Long academicYearId, Long majorId) {
         List<Student> students;
-        if (facultyId != null) {
+        if (majorId != null) {
+            students = studentRepository.findByMajorId(majorId);
+        } else if (facultyId != null) {
             students = studentRepository.findByFacultyId(facultyId);
         } else if (academicYearId != null) {
             students = studentRepository.findByAcademicYearId(academicYearId);
@@ -101,6 +106,12 @@ public class StudentService {
             student.setAcademicYear(academicYear);
         }
 
+        if (request.getMajorId() != null) {
+            com.rupp.payment.entity.Major major = majorRepository.findById(request.getMajorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Major", "id", request.getMajorId()));
+            student.setMajor(major);
+        }
+
         Student saved = studentRepository.save(student);
         return StudentResponse.fromEntity(saved);
     }
@@ -128,6 +139,12 @@ public class StudentService {
             AcademicYear academicYear = academicYearRepository.findById(request.getAcademicYearId())
                     .orElseThrow(() -> new ResourceNotFoundException("AcademicYear", "id", request.getAcademicYearId()));
             student.setAcademicYear(academicYear);
+        }
+
+        if (request.getMajorId() != null) {
+            com.rupp.payment.entity.Major major = majorRepository.findById(request.getMajorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Major", "id", request.getMajorId()));
+            student.setMajor(major);
         }
 
         Student updated = studentRepository.save(student);

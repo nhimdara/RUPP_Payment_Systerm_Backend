@@ -52,16 +52,27 @@ public class UserService {
 
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
+<<<<<<< HEAD
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("Username '" + request.getUsername() + "' is already taken");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Email '" + request.getEmail() + "' is already in use");
+=======
+        String username = request.getUsername().trim();
+        String email = request.getEmail().trim().toLowerCase();
+
+        if (userRepository.existsByUsername(username)) {
+            throw new BadRequestException("Username is already taken");
+        }
+        if (userRepository.existsByEmail(email)) {
+            throw new BadRequestException("Email is already in use");
+>>>>>>> origin/feature/academic-structure-crud
         }
 
         User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
+        user.setUsername(username);
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
 
@@ -75,17 +86,19 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
         if (request.getUsername() != null && !request.getUsername().isBlank()) {
-            if (!user.getUsername().equals(request.getUsername()) && userRepository.existsByUsername(request.getUsername())) {
+            String username = request.getUsername().trim();
+            if (!user.getUsername().equalsIgnoreCase(username) && userRepository.existsByUsername(username)) {
                 throw new BadRequestException("Username is already taken");
             }
-            user.setUsername(request.getUsername());
+            user.setUsername(username);
         }
 
         if (request.getEmail() != null && !request.getEmail().isBlank()) {
-            if (!user.getEmail().equalsIgnoreCase(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
+            String email = request.getEmail().trim().toLowerCase();
+            if (!user.getEmail().equalsIgnoreCase(email) && userRepository.existsByEmail(email)) {
                 throw new BadRequestException("Email is already in use");
             }
-            user.setEmail(request.getEmail());
+            user.setEmail(email);
         }
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
