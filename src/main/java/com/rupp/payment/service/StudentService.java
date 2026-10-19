@@ -8,6 +8,7 @@ import com.rupp.payment.entity.Faculty;
 import com.rupp.payment.entity.Student;
 import com.rupp.payment.entity.User;
 import com.rupp.payment.exception.BadRequestException;
+import com.rupp.payment.exception.DuplicateResourceException;
 import com.rupp.payment.exception.ResourceNotFoundException;
 import com.rupp.payment.repository.AcademicYearRepository;
 import com.rupp.payment.repository.FacultyRepository;
@@ -77,7 +78,7 @@ public class StudentService {
     @Transactional
     public StudentResponse createStudent(CreateStudentRequest request) {
         if (studentRepository.existsByUserId(request.getUserId())) {
-            throw new BadRequestException("Student record already exists for user ID: " + request.getUserId());
+            throw new DuplicateResourceException("Student record already exists for user ID: " + request.getUserId());
         }
 
         User user = userRepository.findById(request.getUserId())

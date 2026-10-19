@@ -11,6 +11,7 @@ import com.rupp.payment.entity.Role;
 import com.rupp.payment.entity.Student;
 import com.rupp.payment.entity.User;
 import com.rupp.payment.exception.BadRequestException;
+import com.rupp.payment.exception.DuplicateResourceException;
 import com.rupp.payment.exception.ResourceNotFoundException;
 import com.rupp.payment.repository.AcademicYearRepository;
 import com.rupp.payment.repository.FacultyRepository;
@@ -56,11 +57,11 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new BadRequestException("Username is already taken");
+            throw new DuplicateResourceException("Username '" + request.getUsername() + "' is already taken");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new BadRequestException("Email is already in use");
+            throw new DuplicateResourceException("Email '" + request.getEmail() + "' is already in use");
         }
 
         Role role = request.getRole() != null ? request.getRole() : Role.ROLE_STUDENT;
