@@ -13,4 +13,5 @@ public interface MajorRepository extends JpaRepository<Major, Long> {
     boolean existsByMajorCode(String majorCode);
     boolean existsByMajorCodeAndIdNot(String majorCode, Long id);
     List<Major> findByFacultyId(Long facultyId);
+    boolean existsByFacultyId(Long facultyId);
 }

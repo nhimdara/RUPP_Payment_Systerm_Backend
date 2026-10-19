@@ -32,6 +32,8 @@ public class DataInitializer implements CommandLineRunner {
     private final AcademicYearRepository academicYearRepository;
     private final MajorRepository majorRepository;
     private final SemesterRepository semesterRepository;
+    private final com.rupp.payment.repository.PaymentStatusRepository paymentStatusRepository;
+    private final com.rupp.payment.repository.TuitionFeeStructureRepository tuitionFeeRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(UserRepository userRepository,
@@ -40,6 +42,8 @@ public class DataInitializer implements CommandLineRunner {
                            AcademicYearRepository academicYearRepository,
                            MajorRepository majorRepository,
                            SemesterRepository semesterRepository,
+                           com.rupp.payment.repository.PaymentStatusRepository paymentStatusRepository,
+                           com.rupp.payment.repository.TuitionFeeStructureRepository tuitionFeeRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.studentRepository = studentRepository;
@@ -47,6 +51,8 @@ public class DataInitializer implements CommandLineRunner {
         this.academicYearRepository = academicYearRepository;
         this.majorRepository = majorRepository;
         this.semesterRepository = semesterRepository;
+        this.paymentStatusRepository = paymentStatusRepository;
+        this.tuitionFeeRepository = tuitionFeeRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -124,6 +130,42 @@ public class DataInitializer implements CommandLineRunner {
             studentRepository.save(student);
 
             logger.info("Default STUDENT user created: student1 / student123");
+        }
+
+        // Seed Payment Statuses if none exist
+        seedPaymentStatus("PENDING");
+        seedPaymentStatus("VERIFIED");
+        seedPaymentStatus("CONFIRMED");
+        seedPaymentStatus("REJECTED");
+
+        // Seed Tuition Fee Structure for CS and 2024-2025 if none exists
+        if (!tuitionFeeRepository.existsByFacultyIdAndAcademicYearId(csFaculty.getId(), year2025.getId())) {
+            com.rupp.payment.entity.TuitionFeeStructure csFee = new com.rupp.payment.entity.TuitionFeeStructure(
+                    csFaculty,
+                    year2025,
+                    new java.math.BigDecimal("600.00"),
+                    LocalDate.of(2025, 1, 15)
+            );
+            tuitionFeeRepository.save(csFee);
+            logger.info("Default Tuition Fee Structure created for Computer Science 2024-2025: $600.00");
+        }
+
+        if (!tuitionFeeRepository.existsByFacultyIdAndAcademicYearId(teFaculty.getId(), year2025.getId())) {
+            com.rupp.payment.entity.TuitionFeeStructure teFee = new com.rupp.payment.entity.TuitionFeeStructure(
+                    teFaculty,
+                    year2025,
+                    new java.math.BigDecimal("700.00"),
+                    LocalDate.of(2025, 1, 15)
+            );
+            tuitionFeeRepository.save(teFee);
+            logger.info("Default Tuition Fee Structure created for Telecommunication Engineering 2024-2025: $700.00");
+        }
+    }
+
+    private void seedPaymentStatus(String statusName) {
+        if (!paymentStatusRepository.existsByStatusName(statusName)) {
+            paymentStatusRepository.save(new com.rupp.payment.entity.PaymentStatus(statusName));
+            logger.info("Default PaymentStatus created: {}", statusName);
         }
     }
 }

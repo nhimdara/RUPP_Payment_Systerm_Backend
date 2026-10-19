@@ -51,6 +51,15 @@ public class StudentController {
         return ResponseEntity.ok(ApiResponse.success("Student profile fetched successfully", response));
     }
 
+    @PutMapping("/my-academic-info")
+    @Operation(summary = "Select/update academic information", description = "Allows logged-in students to select or update their faculty, academic year, and major.")
+    public ResponseEntity<ApiResponse<StudentResponse>> updateMyAcademicInfo(
+            @Valid @RequestBody com.rupp.payment.dto.request.SelectAcademicInfoRequest request) {
+        User currentUser = authService.getCurrentAuthenticatedUser();
+        StudentResponse response = studentService.updateMyAcademicInfo(currentUser, request);
+        return ResponseEntity.ok(ApiResponse.success("Academic information updated successfully", response));
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FINANCE_STAFF')")
     @Operation(summary = "Get student by ID", description = "Retrieve a student record by its student ID.")

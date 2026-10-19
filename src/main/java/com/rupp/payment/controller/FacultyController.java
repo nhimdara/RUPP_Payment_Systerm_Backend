@@ -36,4 +36,29 @@ public class FacultyController {
         Faculty faculty = facultyService.getFacultyById(id);
         return ResponseEntity.ok(ApiResponse.success("Faculty fetched successfully", faculty));
     }
+
+    @PostMapping
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @Operation(summary = "Create faculty", description = "Admin creates a new academic faculty.")
+    public ResponseEntity<ApiResponse<Faculty>> createFaculty(@jakarta.validation.Valid @RequestBody com.rupp.payment.dto.request.CreateFacultyRequest request) {
+        Faculty created = facultyService.createFaculty(request);
+        return new ResponseEntity<>(ApiResponse.success("Faculty created successfully", created), org.springframework.http.HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @Operation(summary = "Update faculty", description = "Admin updates an existing faculty's name or department.")
+    public ResponseEntity<ApiResponse<Faculty>> updateFaculty(@PathVariable Long id,
+                                                              @jakarta.validation.Valid @RequestBody com.rupp.payment.dto.request.UpdateFacultyRequest request) {
+        Faculty updated = facultyService.updateFaculty(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Faculty updated successfully", updated));
+    }
+
+    @DeleteMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @Operation(summary = "Delete faculty", description = "Admin deletes an existing faculty.")
+    public ResponseEntity<ApiResponse<Void>> deleteFaculty(@PathVariable Long id) {
+        facultyService.deleteFaculty(id);
+        return ResponseEntity.ok(ApiResponse.success("Faculty deleted successfully", null));
+    }
 }

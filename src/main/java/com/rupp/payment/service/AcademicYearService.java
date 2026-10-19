@@ -19,13 +19,16 @@ public class AcademicYearService {
     private final AcademicYearRepository academicYearRepository;
     private final com.rupp.payment.repository.SemesterRepository semesterRepository;
     private final com.rupp.payment.repository.StudentRepository studentRepository;
+    private final com.rupp.payment.repository.TuitionFeeStructureRepository tuitionFeeRepository;
 
     public AcademicYearService(AcademicYearRepository academicYearRepository,
                                com.rupp.payment.repository.SemesterRepository semesterRepository,
-                               com.rupp.payment.repository.StudentRepository studentRepository) {
+                               com.rupp.payment.repository.StudentRepository studentRepository,
+                               com.rupp.payment.repository.TuitionFeeStructureRepository tuitionFeeRepository) {
         this.academicYearRepository = academicYearRepository;
         this.semesterRepository = semesterRepository;
         this.studentRepository = studentRepository;
+        this.tuitionFeeRepository = tuitionFeeRepository;
     }
 
     @Transactional(readOnly = true)
@@ -102,6 +105,10 @@ public class AcademicYearService {
 
         if (!studentRepository.findByAcademicYearId(id).isEmpty()) {
             throw new BadRequestException("Cannot delete academic year: it is currently referenced by enrolled students.");
+        }
+
+        if (tuitionFeeRepository.existsByAcademicYearId(id)) {
+            throw new BadRequestException("Cannot delete academic year: it is currently referenced by tuition fee structures.");
         }
 
         academicYearRepository.delete(academicYear);

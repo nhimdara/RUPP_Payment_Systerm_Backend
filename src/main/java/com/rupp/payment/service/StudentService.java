@@ -80,6 +80,31 @@ public class StudentService {
     }
 
     @Transactional
+    public StudentResponse updateMyAcademicInfo(User currentUser, com.rupp.payment.dto.request.SelectAcademicInfoRequest request) {
+        Student student = studentRepository.findByUser(currentUser)
+                .orElseThrow(() -> new ResourceNotFoundException("No student profile found for current user: " + currentUser.getUsername()));
+
+        Faculty faculty = facultyRepository.findById(request.getFacultyId())
+                .orElseThrow(() -> new ResourceNotFoundException("Faculty", "id", request.getFacultyId()));
+        student.setFaculty(faculty);
+
+        AcademicYear academicYear = academicYearRepository.findById(request.getAcademicYearId())
+                .orElseThrow(() -> new ResourceNotFoundException("AcademicYear", "id", request.getAcademicYearId()));
+        student.setAcademicYear(academicYear);
+
+        if (request.getMajorId() != null) {
+            com.rupp.payment.entity.Major major = majorRepository.findById(request.getMajorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Major", "id", request.getMajorId()));
+            student.setMajor(major);
+        } else {
+            student.setMajor(null);
+        }
+
+        Student updated = studentRepository.save(student);
+        return StudentResponse.fromEntity(updated);
+    }
+
+    @Transactional
     public StudentResponse createStudent(CreateStudentRequest request) {
         if (studentRepository.existsByUserId(request.getUserId())) {
             throw new BadRequestException("Student record already exists for user ID: " + request.getUserId());
