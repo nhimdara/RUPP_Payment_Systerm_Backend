@@ -1,21 +1,16 @@
 package com.rupp.payment.config;
 
-import com.rupp.payment.entity.AcademicYear;
-import com.rupp.payment.entity.Faculty;
-import com.rupp.payment.entity.Role;
-import com.rupp.payment.entity.Student;
-import com.rupp.payment.entity.User;
-import com.rupp.payment.repository.AcademicYearRepository;
-import com.rupp.payment.repository.FacultyRepository;
-import com.rupp.payment.repository.StudentRepository;
-import com.rupp.payment.repository.UserRepository;
+import com.rupp.payment.entity.*;
+import com.rupp.payment.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Configuration
 public class DataInitializer implements CommandLineRunner {
@@ -26,17 +21,29 @@ public class DataInitializer implements CommandLineRunner {
     private final StudentRepository studentRepository;
     private final FacultyRepository facultyRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final SemesterRepository semesterRepository;
+    private final TuitionFeeStructureRepository feeStructureRepository;
+    private final PaymentRepository paymentRepository;
+    private final ReceiptRepository receiptRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(UserRepository userRepository,
                            StudentRepository studentRepository,
                            FacultyRepository facultyRepository,
                            AcademicYearRepository academicYearRepository,
+                           SemesterRepository semesterRepository,
+                           TuitionFeeStructureRepository feeStructureRepository,
+                           PaymentRepository paymentRepository,
+                           ReceiptRepository receiptRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.studentRepository = studentRepository;
         this.facultyRepository = facultyRepository;
         this.academicYearRepository = academicYearRepository;
+        this.semesterRepository = semesterRepository;
+        this.feeStructureRepository = feeStructureRepository;
+        this.paymentRepository = paymentRepository;
+        this.receiptRepository = receiptRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -96,6 +103,64 @@ public class DataInitializer implements CommandLineRunner {
             studentRepository.save(student);
 
             logger.info("Default STUDENT user created: student1 / student123");
+        }
+
+        // Seed Semester if none exist
+        Semester semester1 = semesterRepository.findAll().stream().findFirst()
+                .orElseGet(() -> semesterRepository.save(new Semester("Semester 1", year2025)));
+
+        // Seed Tuition Fee Structures if none exist
+        TuitionFeeStructure feeStructure = feeStructureRepository.findByFacultyIdAndAcademicYearId(csFaculty.getId(), year2025.getId())
+                .orElseGet(() -> feeStructureRepository.save(new TuitionFeeStructure(
+                        csFaculty,
+                        year2025,
+                        semester1,
+                        new BigDecimal("600.00"),
+                        LocalDate.of(2025, 11, 30)
+                )));
+
+        // Seed Sample Payment and Receipt if none exist
+        if (paymentRepository.count() == 0) {
+            studentRepository.findAll().stream().findFirst().ifPresent(student -> {
+                // 1. Confirmed payment with receipt
+                Payment confirmedPayment = new Payment();
+                confirmedPayment.setStudent(student);
+                confirmedPayment.setFeeStructure(feeStructure);
+                confirmedPayment.setTotalPaid(new BigDecimal("600.00"));
+                confirmedPayment.setStatus(PaymentStatus.CONFIRMED);
+                confirmedPayment.setPaymentDate(LocalDateTime.now().minusDays(3));
+                confirmedPayment.setRemarks("Full semester tuition fee paid via ABA");
+
+                PaymentDetail detail1 = new PaymentDetail("ABA_PAY", "ABA-TXN-889123", new BigDecimal("600.00"));
+                confirmedPayment.addDetail(detail1);
+
+                Payment savedConfirmed = paymentRepository.save(confirmedPayment);
+
+                Receipt receipt = new Receipt(
+                        savedConfirmed,
+                        "RCP-20261019-0001",
+                        LocalDateTime.now().minusDays(3),
+                        new BigDecimal("600.00")
+                );
+                savedConfirmed.setReceipt(receipt);
+                receiptRepository.save(receipt);
+                paymentRepository.save(savedConfirmed);
+
+                // 2. Pending payment for testing verification
+                Payment pendingPayment = new Payment();
+                pendingPayment.setStudent(student);
+                pendingPayment.setFeeStructure(feeStructure);
+                pendingPayment.setTotalPaid(new BigDecimal("300.00"));
+                pendingPayment.setStatus(PaymentStatus.PENDING);
+                pendingPayment.setPaymentDate(LocalDateTime.now().minusHours(4));
+                pendingPayment.setRemarks("First installment paid via Wing");
+
+                PaymentDetail detail2 = new PaymentDetail("WING", "WING-TXN-441299", new BigDecimal("300.00"));
+                pendingPayment.addDetail(detail2);
+                paymentRepository.save(pendingPayment);
+
+                logger.info("Sample payments initialized: 1 CONFIRMED with receipt, 1 PENDING");
+            });
         }
     }
 }

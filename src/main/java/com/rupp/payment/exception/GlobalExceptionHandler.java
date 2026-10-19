@@ -26,6 +26,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ApiResponse.error(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidPaymentStatusTransitionException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidPaymentStatusTransitionException(InvalidPaymentStatusTransitionException ex) {
+        return new ResponseEntity<>(ApiResponse.error(ex.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentialsException(BadCredentialsException ex) {
         return new ResponseEntity<>(ApiResponse.error("Invalid username/email or password"), HttpStatus.UNAUTHORIZED);
