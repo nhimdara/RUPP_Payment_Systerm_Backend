@@ -2,6 +2,8 @@ package com.rupp.payment.dto.response;
 
 import com.rupp.payment.entity.PaymentStatus;
 
+import java.util.Objects;
+
 public class PaymentStatusResponse {
 
     private Long id;
@@ -32,8 +34,31 @@ public class PaymentStatusResponse {
         return statusName;
     }
 
+    /**
+     * Compact accessor used by the payment workflow services.
+     */
+    public String status() {
+        return statusName;
+    }
+
     public void setStatusName(String statusName) {
         this.statusName = statusName;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof PaymentStatusResponse that)) {
+            return false;
+        }
+        return Objects.equals(id, that.id) && Objects.equals(statusName, that.statusName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, statusName);
     }
 }
 

@@ -144,6 +144,16 @@ public class DataInitializer implements CommandLineRunner {
         seedStudentUser("chhuntheang", "chhuntheang@rupp.edu.kh", "student123", "Chhuntheang", "Thorn", itFaculty, year2025, iteMajor);
         seedStudentUser("chihong", "chihong@rupp.edu.kh", "student123", "Chihong", "Tang", csFaculty, year2025, csMajor);
         seedStudentUser("vannsonleng", "vannsonleng@rupp.edu.kh", "student123", "Vannsonleng", "Nuon", teFaculty, year2025, iteMajor);
+
+        // 9. Seed Payment Statuses
+        seedPaymentStatus("PENDING");
+        seedPaymentStatus("VERIFIED");
+        seedPaymentStatus("CONFIRMED");
+        seedPaymentStatus("REJECTED");
+
+        // 10. Seed Tuition Fee Structures
+        seedTuitionFeeStructure(csFaculty, year2025, "600.00");
+        seedTuitionFeeStructure(teFaculty, year2025, "700.00");
     }
 
     private void seedStudentUser(String username, String email, String rawPassword,
@@ -169,33 +179,18 @@ public class DataInitializer implements CommandLineRunner {
             logger.info("Seeded Student User: {} ({} {})", username, firstName, lastName);
         }
 
-        // Seed Payment Statuses if none exist
-        seedPaymentStatus("PENDING");
-        seedPaymentStatus("VERIFIED");
-        seedPaymentStatus("CONFIRMED");
-        seedPaymentStatus("REJECTED");
+    }
 
-        // Seed Tuition Fee Structure for CS and 2024-2025 if none exists
-        if (!tuitionFeeRepository.existsByFacultyIdAndAcademicYearId(csFaculty.getId(), year2025.getId())) {
-            com.rupp.payment.entity.TuitionFeeStructure csFee = new com.rupp.payment.entity.TuitionFeeStructure(
-                    csFaculty,
-                    year2025,
-                    new java.math.BigDecimal("600.00"),
+    private void seedTuitionFeeStructure(Faculty faculty, AcademicYear academicYear, String amount) {
+        if (!tuitionFeeRepository.existsByFacultyIdAndAcademicYearId(faculty.getId(), academicYear.getId())) {
+            tuitionFeeRepository.save(new com.rupp.payment.entity.TuitionFeeStructure(
+                    faculty,
+                    academicYear,
+                    new java.math.BigDecimal(amount),
                     LocalDate.of(2025, 1, 15)
-            );
-            tuitionFeeRepository.save(csFee);
-            logger.info("Default Tuition Fee Structure created for Computer Science 2024-2025: $600.00");
-        }
-
-        if (!tuitionFeeRepository.existsByFacultyIdAndAcademicYearId(teFaculty.getId(), year2025.getId())) {
-            com.rupp.payment.entity.TuitionFeeStructure teFee = new com.rupp.payment.entity.TuitionFeeStructure(
-                    teFaculty,
-                    year2025,
-                    new java.math.BigDecimal("700.00"),
-                    LocalDate.of(2025, 1, 15)
-            );
-            tuitionFeeRepository.save(teFee);
-            logger.info("Default Tuition Fee Structure created for Telecommunication Engineering 2024-2025: $700.00");
+            ));
+            logger.info("Default Tuition Fee Structure created for {} {}: ${}",
+                    faculty.getFacultyName(), academicYear.getYearLabel(), amount);
         }
     }
 
