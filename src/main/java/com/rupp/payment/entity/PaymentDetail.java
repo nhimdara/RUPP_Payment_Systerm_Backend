@@ -13,15 +13,25 @@ public class PaymentDetail {
     @Column(name = "payment_detail_id")
     private Long id;
 
+<<<<<<< HEAD
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id", nullable = false)
+=======
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id", nullable = false)
+    @JsonIgnore
+>>>>>>> origin/feature/search
     private Payment payment;
 
     @Column(name = "method", nullable = false, length = 50)
     private String method;
 
+<<<<<<< HEAD
     @Column(name = "transaction_ref", length = 100)
+=======
+    @Column(name = "transaction_ref", nullable = false, length = 100)
+>>>>>>> origin/feature/search
     private String transactionRef;
 
     @Column(name = "amount", nullable = false, precision = 12, scale = 2)
@@ -37,6 +47,15 @@ public class PaymentDetail {
         this.amount = amount;
     }
 
+<<<<<<< HEAD
+=======
+    public PaymentDetail(String method, String transactionRef, BigDecimal amount) {
+        this.method = method;
+        this.transactionRef = transactionRef;
+        this.amount = amount;
+    }
+
+>>>>>>> origin/feature/search
     public Long getId() {
         return id;
     }

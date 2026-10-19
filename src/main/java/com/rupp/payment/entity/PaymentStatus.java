@@ -1,5 +1,6 @@
 package com.rupp.payment.entity;
 
+<<<<<<< HEAD
 import jakarta.persistence.*;
 
 @Entity
@@ -46,4 +47,13 @@ public class PaymentStatus {
     public void setStatusName(String statusName) {
         this.statusName = statusName;
     }
+=======
+public enum PaymentStatus {
+    PENDING,
+    VERIFIED,
+    CONFIRMED,
+    REJECTED,
+    CANCELLED,
+    REFUNDED
+>>>>>>> origin/feature/search
 }

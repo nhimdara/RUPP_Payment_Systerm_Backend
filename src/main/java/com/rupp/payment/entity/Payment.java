@@ -23,9 +23,15 @@ public class Payment {
     @JoinColumn(name = "fee_structure_id", nullable = false)
     private TuitionFeeStructure feeStructure;
 
+<<<<<<< HEAD
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "payment_status_id", nullable = false)
     private PaymentStatus paymentStatus;
+=======
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false, length = 30)
+    private PaymentStatus status;
+>>>>>>> origin/feature/search
 
     @Column(name = "payment_date", nullable = false)
     private LocalDateTime paymentDate;
@@ -33,6 +39,7 @@ public class Payment {
     @Column(name = "total_paid", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalPaid;
 
+<<<<<<< HEAD
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PaymentDetail> paymentDetails = new ArrayList<>();
 
@@ -46,6 +53,38 @@ public class Payment {
         this.paymentStatus = paymentStatus;
         this.paymentDate = paymentDate;
         this.totalPaid = totalPaid;
+=======
+    @Column(name = "remarks", length = 500)
+    private String remarks;
+
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<PaymentDetail> details = new ArrayList<>();
+
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Receipt receipt;
+
+    public Payment() {
+        this.paymentDate = LocalDateTime.now();
+        this.status = PaymentStatus.PENDING;
+    }
+
+    public Payment(Student student, TuitionFeeStructure feeStructure, BigDecimal totalPaid, PaymentStatus status) {
+        this.student = student;
+        this.feeStructure = feeStructure;
+        this.totalPaid = totalPaid;
+        this.status = status;
+        this.paymentDate = LocalDateTime.now();
+    }
+
+    public void addDetail(PaymentDetail detail) {
+        details.add(detail);
+        detail.setPayment(this);
+    }
+
+    public void removeDetail(PaymentDetail detail) {
+        details.remove(detail);
+        detail.setPayment(null);
+>>>>>>> origin/feature/search
     }
 
     public Long getId() {
@@ -72,12 +111,21 @@ public class Payment {
         this.feeStructure = feeStructure;
     }
 
+<<<<<<< HEAD
     public PaymentStatus getPaymentStatus() {
         return paymentStatus;
     }
 
     public void setPaymentStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
+=======
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
+>>>>>>> origin/feature/search
     }
 
     public LocalDateTime getPaymentDate() {
@@ -96,6 +144,7 @@ public class Payment {
         this.totalPaid = totalPaid;
     }
 
+<<<<<<< HEAD
     public List<PaymentDetail> getPaymentDetails() {
         return paymentDetails;
     }
@@ -107,5 +156,32 @@ public class Payment {
     public void addPaymentDetail(PaymentDetail detail) {
         paymentDetails.add(detail);
         detail.setPayment(this);
+=======
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public List<PaymentDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<PaymentDetail> details) {
+        this.details = details;
+    }
+
+    public Receipt getReceipt() {
+        return receipt;
+    }
+
+    public void setReceipt(Receipt receipt) {
+        this.receipt = receipt;
+        if (receipt != null) {
+            receipt.setPayment(this);
+        }
+>>>>>>> origin/feature/search
     }
 }

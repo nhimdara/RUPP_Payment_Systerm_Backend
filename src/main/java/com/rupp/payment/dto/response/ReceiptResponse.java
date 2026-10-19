@@ -1,36 +1,50 @@
 package com.rupp.payment.dto.response;
 
+<<<<<<< HEAD
 import com.rupp.payment.entity.Payment;
 import com.rupp.payment.entity.Receipt;
+=======
+>>>>>>> origin/feature/search
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class ReceiptResponse {
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/feature/search
     private Long id;
     private Long paymentId;
     private String receiptNumber;
     private LocalDateTime issueDate;
     private BigDecimal totalAmount;
+<<<<<<< HEAD
     private String studentName;
     private String studentEmail;
     private String facultyName;
     private String academicYearLabel;
     private String paymentMethod;
     private String transactionRef;
+=======
+>>>>>>> origin/feature/search
 
     public ReceiptResponse() {
     }
 
+<<<<<<< HEAD
     public ReceiptResponse(Long id, Long paymentId, String receiptNumber, LocalDateTime issueDate,
                            BigDecimal totalAmount, String studentName, String studentEmail,
                            String facultyName, String academicYearLabel, String paymentMethod,
                            String transactionRef) {
+=======
+    public ReceiptResponse(Long id, Long paymentId, String receiptNumber, LocalDateTime issueDate, BigDecimal totalAmount) {
+>>>>>>> origin/feature/search
         this.id = id;
         this.paymentId = paymentId;
         this.receiptNumber = receiptNumber;
         this.issueDate = issueDate;
         this.totalAmount = totalAmount;
+<<<<<<< HEAD
         this.studentName = studentName;
         this.studentEmail = studentEmail;
         this.facultyName = facultyName;
@@ -83,6 +97,8 @@ public class ReceiptResponse {
                 method,
                 txnRef
         );
+=======
+>>>>>>> origin/feature/search
     }
 
     public Long getId() {
@@ -124,6 +140,7 @@ public class ReceiptResponse {
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
+<<<<<<< HEAD
 
     public String getStudentName() {
         return studentName;
@@ -172,4 +189,6 @@ public class ReceiptResponse {
     public void setTransactionRef(String transactionRef) {
         this.transactionRef = transactionRef;
     }
+=======
+>>>>>>> origin/feature/search
 }

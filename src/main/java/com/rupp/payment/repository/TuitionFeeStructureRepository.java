@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface TuitionFeeStructureRepository extends JpaRepository<TuitionFeeStructure, Long> {
+<<<<<<< HEAD
 
     List<TuitionFeeStructure> findByFacultyId(Long facultyId);
 
@@ -23,4 +24,9 @@ public interface TuitionFeeStructureRepository extends JpaRepository<TuitionFeeS
     boolean existsByFacultyId(Long facultyId);
 
     boolean existsByAcademicYearId(Long academicYearId);
+=======
+    List<TuitionFeeStructure> findByFacultyId(Long facultyId);
+    List<TuitionFeeStructure> findByAcademicYearId(Long academicYearId);
+    Optional<TuitionFeeStructure> findByFacultyIdAndAcademicYearId(Long facultyId, Long academicYearId);
+>>>>>>> origin/feature/search
 }
