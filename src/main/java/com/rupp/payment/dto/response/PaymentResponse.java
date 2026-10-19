@@ -30,6 +30,10 @@ public class PaymentResponse {
     }
 
     public static PaymentResponse from(Payment payment) {
+        return fromEntity(payment);
+    }
+
+    public static PaymentResponse fromEntity(Payment payment) {
         PaymentResponse response = new PaymentResponse();
         response.setId(payment.getId());
         if (payment.getStudent() != null) {

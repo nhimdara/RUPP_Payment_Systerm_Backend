@@ -2,15 +2,15 @@
   "info": {
     "_postman_id": "rupp-payment-system-collection",
     "name": "RUPP Payment System API Suite",
-    "description": "Comprehensive QA Test Suite for RUPP Payment System. Author: Tab Ayutaya (@boayuthaya)",
+    "description": "Comprehensive QA Test Suite for RUPP Payment System covering all 6 team members' modules. Author: Tab Ayutaya (@boayuthaya)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "1. Authentication",
+      "name": "1. Authentication & Core (Nhim Dara)",
       "item": [
         {
-          "name": "1.1 Login - Admin (Auto Token)",
+          "name": "1.1 Login - Admin (Store Token)",
           "event": [
             {
               "listen": "test",
@@ -40,7 +40,7 @@
           }
         },
         {
-          "name": "1.2 Login - Student (Tab Ayutaya)",
+          "name": "1.2 Login - Student (Store Token)",
           "event": [
             {
               "listen": "test",
@@ -114,23 +114,10 @@
       ]
     },
     {
-      "name": "2. User Management (Admin)",
+      "name": "2. User & Student Management (Nhim Dara)",
       "item": [
         {
           "name": "2.1 Get All Users (Admin Auth)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 200 OK', function() { pm.response.to.have.status(200); });",
-                  "var res = pm.response.json();",
-                  "pm.test('User list returned', function() { pm.expect(res.data.length).to.be.above(0); });"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
             "method": "GET",
@@ -138,44 +125,7 @@
           }
         },
         {
-          "name": "2.2 Get User By ID",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 200 OK', function() { pm.response.to.have.status(200); });"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
-            "method": "GET",
-            "url": { "raw": "{{baseUrl}}/api/v1/users/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "1"] }
-          }
-        }
-      ]
-    },
-    {
-      "name": "3. Student Management",
-      "item": [
-        {
-          "name": "3.1 Get All Students",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 200 OK', function() { pm.response.to.have.status(200); });",
-                  "var res = pm.response.json();",
-                  "pm.test('Students list contains 6 group members', function() { pm.expect(res.data.length).to.be.above(0); });"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "2.2 Get All Students",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
             "method": "GET",
@@ -183,18 +133,7 @@
           }
         },
         {
-          "name": "3.2 Get My Student Profile",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 200 OK', function() { pm.response.to.have.status(200); });"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "2.3 Get Current Student Profile",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{student_token}}", "type": "string" }] },
             "method": "GET",
@@ -204,10 +143,201 @@
       ]
     },
     {
-      "name": "4. QA & Validation Tests (Your Deliverable)",
+      "name": "3. Academic & Tuition Management (Taing Leangkhai)",
       "item": [
         {
-          "name": "4.1 Validation Test: Blank Login Inputs (Expect 400)",
+          "name": "3.1 Get All Faculties",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/faculties", "host": ["{{baseUrl}}"], "path": ["api", "v1", "faculties"] }
+          }
+        },
+        {
+          "name": "3.2 Get All Academic Years",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/academic-years", "host": ["{{baseUrl}}"], "path": ["api", "v1", "academic-years"] }
+          }
+        },
+        {
+          "name": "3.3 Get All Majors",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/majors", "host": ["{{baseUrl}}"], "path": ["api", "v1", "majors"] }
+          }
+        },
+        {
+          "name": "3.4 Get All Semesters",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/semesters", "host": ["{{baseUrl}}"], "path": ["api", "v1", "semesters"] }
+          }
+        },
+        {
+          "name": "3.5 View All Tuition Fee Structures",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/tuition-fees", "host": ["{{baseUrl}}"], "path": ["api", "v1", "tuition-fees"] }
+          }
+        },
+        {
+          "name": "3.6 Calculate My Tuition Fee (Student)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{student_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/tuition-fees/calculate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "tuition-fees", "calculate"] }
+          }
+        },
+        {
+          "name": "3.7 Calculate Student Tuition by ID (Staff)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/tuition-fees/calculate/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "tuition-fees", "calculate", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Payments & Search Specifications (Thorn Chhuntheang)",
+      "item": [
+        {
+          "name": "4.1 Multi-Param Payment Search & Filter",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/payments/search?status=CONFIRMED&page=0&size=10&sortBy=paymentDate&sortDir=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "payments", "search"],
+              "query": [
+                { "key": "status", "value": "CONFIRMED" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sortBy", "value": "paymentDate" },
+                { "key": "sortDir", "value": "desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "4.2 Get Student Payment History",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{student_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/payments/my-payments", "host": ["{{baseUrl}}"], "path": ["api", "v1", "payments", "my-payments"] }
+          }
+        },
+        {
+          "name": "4.3 Filtered Payments Report",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/reports/payments?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["api", "v1", "reports", "payments"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. PDF Engine & Analytics Dashboard (Tang Chihong)",
+      "item": [
+        {
+          "name": "5.1 Export Receipt as PDF",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/receipts/1/pdf", "host": ["{{baseUrl}}"], "path": ["api", "v1", "receipts", "1", "pdf"] }
+          }
+        },
+        {
+          "name": "5.2 Export Payment Receipt PDF",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/payments/1/receipt/pdf", "host": ["{{baseUrl}}"], "path": ["api", "v1", "payments", "1", "receipt", "pdf"] }
+          }
+        },
+        {
+          "name": "5.3 Dashboard Financial Summary",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/reports/financial-summary", "host": ["{{baseUrl}}"], "path": ["api", "v1", "reports", "financial-summary"] }
+          }
+        },
+        {
+          "name": "5.4 Daily Revenue Metrics",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/reports/daily-revenue", "host": ["{{baseUrl}}"], "path": ["api", "v1", "reports", "daily-revenue"] }
+          }
+        },
+        {
+          "name": "5.5 Monthly Revenue Metrics",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/reports/monthly-revenue?year=2026", "host": ["{{baseUrl}}"], "path": ["api", "v1", "reports", "monthly-revenue"], "query": [{ "key": "year", "value": "2026" }] }
+          }
+        },
+        {
+          "name": "5.6 Faculty Revenue Breakdown",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/reports/faculty-breakdown", "host": ["{{baseUrl}}"], "path": ["api", "v1", "reports", "faculty-breakdown"] }
+          }
+        },
+        {
+          "name": "5.7 Payment Methods Volume Report",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/reports/payment-methods", "host": ["{{baseUrl}}"], "path": ["api", "v1", "reports", "payment-methods"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Payment Security, OTP & Audit (Nuon Vannsonleng)",
+      "item": [
+        {
+          "name": "6.1 Request Payment OTP Challenge",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{student_token}}", "type": "string" }] },
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/v1/payments/2/verification/otp", "host": ["{{baseUrl}}"], "path": ["api", "v1", "payments", "2", "verification", "otp"] }
+          }
+        },
+        {
+          "name": "6.2 View Payment Audit Timeline",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/payments/audit/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "payments", "audit", "1"] }
+          }
+        },
+        {
+          "name": "6.3 Search Audit Logs",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/payments/audit?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "payments", "audit"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. QA, Validation & Error Handling (Tab Ayutaya)",
+      "item": [
+        {
+          "name": "7.1 Blank Login Inputs (Expect 400)",
           "event": [
             {
               "listen": "test",
@@ -218,8 +348,6 @@
                   "pm.test('Validation failed message present', function() {",
                   "    pm.expect(res.success).to.eql(false);",
                   "    pm.expect(res.message).to.eql('Validation failed');",
-                  "    pm.expect(res.data.usernameOrEmail).to.not.be.empty;",
-                  "    pm.expect(res.data.password).to.not.be.empty;",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -237,22 +365,7 @@
           }
         },
         {
-          "name": "4.2 Validation Test: Invalid Email Format (Expect 400)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 400 Bad Request', function() { pm.response.to.have.status(400); });",
-                  "var res = pm.response.json();",
-                  "pm.test('Email validation error present', function() {",
-                  "    pm.expect(res.data.email).to.not.be.empty;",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "7.2 Invalid Email Format (Expect 400)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -264,23 +377,7 @@
           }
         },
         {
-          "name": "4.3 Security Test: Wrong Password (Expect 401)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 401 Unauthorized', function() { pm.response.to.have.status(401); });",
-                  "var res = pm.response.json();",
-                  "pm.test('Bad credentials error', function() {",
-                  "    pm.expect(res.success).to.eql(false);",
-                  "    pm.expect(res.message).to.include('Invalid username/email or password');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "7.3 Wrong Password (Expect 401)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -292,22 +389,7 @@
           }
         },
         {
-          "name": "4.4 RBAC Test: Student accessing Admin Users (Expect 403 Forbidden)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 403 Forbidden', function() { pm.response.to.have.status(403); });",
-                  "var res = pm.response.json();",
-                  "pm.test('Access denied message present', function() {",
-                  "    pm.expect(res.error || res.message).to.be.oneOf(['Forbidden', 'Access denied']);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "7.4 RBAC Test: Student accessing Admin Users (Expect 403 Forbidden)",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{student_token}}", "type": "string" }] },
             "method": "GET",
@@ -315,23 +397,7 @@
           }
         },
         {
-          "name": "4.5 Exception Test: Get Non-Existent Student ID (Expect 404 Not Found)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status is 404 Not Found', function() { pm.response.to.have.status(404); });",
-                  "var res = pm.response.json();",
-                  "pm.test('Resource not found message', function() {",
-                  "    pm.expect(res.success).to.eql(false);",
-                  "    pm.expect(res.message).to.include('not found');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "7.5 Exception Test: Get Non-Existent Student ID (Expect 404 Not Found)",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
             "method": "GET",

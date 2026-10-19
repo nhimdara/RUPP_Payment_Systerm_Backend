@@ -19,9 +19,11 @@ import java.util.stream.Collectors;
 public class ReceiptService {
 
     private final ReceiptRepository receiptRepository;
+    private final PdfReceiptService pdfReceiptService;
 
-    public ReceiptService(ReceiptRepository receiptRepository) {
+    public ReceiptService(ReceiptRepository receiptRepository, PdfReceiptService pdfReceiptService) {
         this.receiptRepository = receiptRepository;
+        this.pdfReceiptService = pdfReceiptService;
     }
 
     @Transactional(readOnly = true)
@@ -46,6 +48,30 @@ public class ReceiptService {
                 .orElseThrow(() -> new ResourceNotFoundException("Receipt", "receiptNumber", receiptNumber));
         validateAccess(receipt, currentUser);
         return ReceiptResponse.fromEntity(receipt);
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] generateReceiptPdf(Long id, User currentUser) {
+        Receipt receipt = receiptRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Receipt", "id", id));
+        validateAccess(receipt, currentUser);
+        return pdfReceiptService.generateReceiptPdf(receipt);
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] generateReceiptPdfByPaymentId(Long paymentId, User currentUser) {
+        Receipt receipt = receiptRepository.findByPaymentId(paymentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Receipt", "paymentId", paymentId));
+        validateAccess(receipt, currentUser);
+        return pdfReceiptService.generateReceiptPdf(receipt);
+    }
+
+    @Transactional(readOnly = true)
+    public Receipt getReceiptEntity(Long id, User currentUser) {
+        Receipt receipt = receiptRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Receipt", "id", id));
+        validateAccess(receipt, currentUser);
+        return receipt;
     }
 
     @Transactional(readOnly = true)

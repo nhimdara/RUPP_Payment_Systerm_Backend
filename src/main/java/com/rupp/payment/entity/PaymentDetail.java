@@ -5,7 +5,10 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "payment_details")
+@Table(name = "payment_details", indexes = {
+        @Index(name = "idx_payment_details_payment_id", columnList = "payment_id"),
+        @Index(name = "idx_payment_details_method", columnList = "method")
+})
 public class PaymentDetail {
 
     @Id

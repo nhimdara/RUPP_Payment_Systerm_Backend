@@ -7,7 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "payments", indexes = {
+        @Index(name = "idx_payments_status_date", columnList = "payment_status, payment_date"),
+        @Index(name = "idx_payments_student", columnList = "student_id"),
+        @Index(name = "idx_payments_fee_structure", columnList = "fee_structure_id"),
+        @Index(name = "idx_payments_date", columnList = "payment_date")
+})
 public class Payment {
 
     @Id

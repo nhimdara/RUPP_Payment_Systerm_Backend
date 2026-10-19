@@ -21,6 +21,7 @@ public class DataInitializer implements CommandLineRunner {
     private final StudentRepository studentRepository;
     private final FacultyRepository facultyRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final MajorRepository majorRepository;
     private final SemesterRepository semesterRepository;
     private final TuitionFeeStructureRepository feeStructureRepository;
     private final PaymentRepository paymentRepository;
@@ -31,6 +32,7 @@ public class DataInitializer implements CommandLineRunner {
                            StudentRepository studentRepository,
                            FacultyRepository facultyRepository,
                            AcademicYearRepository academicYearRepository,
+                           MajorRepository majorRepository,
                            SemesterRepository semesterRepository,
                            TuitionFeeStructureRepository feeStructureRepository,
                            PaymentRepository paymentRepository,
@@ -40,6 +42,7 @@ public class DataInitializer implements CommandLineRunner {
         this.studentRepository = studentRepository;
         this.facultyRepository = facultyRepository;
         this.academicYearRepository = academicYearRepository;
+        this.majorRepository = majorRepository;
         this.semesterRepository = semesterRepository;
         this.feeStructureRepository = feeStructureRepository;
         this.paymentRepository = paymentRepository;
@@ -62,6 +65,17 @@ public class DataInitializer implements CommandLineRunner {
         academicYearRepository.findByYearLabel("2025-2026")
                 .orElseGet(() -> academicYearRepository.save(
                         new AcademicYear("2025-2026", LocalDate.of(2025, 10, 1), LocalDate.of(2026, 7, 31))));
+
+        // Seed Majors if none exist
+        Major csMajor = majorRepository.findByMajorCode("CS-01")
+                .orElseGet(() -> {
+                    Major m = new Major();
+                    m.setMajorName("Computer Science");
+                    m.setMajorCode("CS-01");
+                    m.setFaculty(csFaculty);
+                    m.setDescription("Core Computer Science Program");
+                    return majorRepository.save(m);
+                });
 
         // Seed Admin User
         if (!userRepository.existsByUsername("admin")) {
@@ -100,9 +114,30 @@ public class DataInitializer implements CommandLineRunner {
             student.setLastName("Nhim");
             student.setFaculty(csFaculty);
             student.setAcademicYear(year2025);
+            student.setMajor(csMajor);
             studentRepository.save(student);
 
             logger.info("Default STUDENT user created: student1 / student123");
+        }
+
+        if (!userRepository.existsByUsername("ayutaya")) {
+            User studentUser = new User();
+            studentUser.setUsername("ayutaya");
+            studentUser.setEmail("ayutaya@rupp.edu.kh");
+            studentUser.setPassword(passwordEncoder.encode("student123"));
+            studentUser.setRole(Role.ROLE_STUDENT);
+            User savedUser = userRepository.save(studentUser);
+
+            Student student = new Student();
+            student.setUser(savedUser);
+            student.setFirstName("Ayutaya");
+            student.setLastName("Tab");
+            student.setFaculty(csFaculty);
+            student.setAcademicYear(year2025);
+            student.setMajor(csMajor);
+            studentRepository.save(student);
+
+            logger.info("Default STUDENT user created: ayutaya / student123");
         }
 
         // Seed Semester if none exist

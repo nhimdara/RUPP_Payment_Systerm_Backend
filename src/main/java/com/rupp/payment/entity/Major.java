@@ -3,7 +3,9 @@ package com.rupp.payment.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "majors")
+@Table(name = "majors", indexes = {
+        @Index(name = "idx_majors_faculty", columnList = "faculty_id")
+})
 public class Major {
 
     @Id

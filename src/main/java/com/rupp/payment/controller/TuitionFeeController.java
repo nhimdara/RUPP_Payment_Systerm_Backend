@@ -56,6 +56,23 @@ public class TuitionFeeController {
         return ResponseEntity.ok(ApiResponse.success("Tuition fee fetched successfully", fee));
     }
 
+    @GetMapping("/calculate")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
+    @Operation(summary = "Calculate current student tuition balance", description = "Computes tuition fee breakdown, payments made, remaining balance, and payment status for the logged-in student.")
+    public ResponseEntity<ApiResponse<com.rupp.payment.dto.response.TuitionCalculationResponse>> calculateMyTuition() {
+        User currentUser = authService.getCurrentAuthenticatedUser();
+        com.rupp.payment.dto.response.TuitionCalculationResponse response = tuitionFeeService.calculateMyTuition(currentUser);
+        return ResponseEntity.ok(ApiResponse.success("Tuition calculation completed successfully", response));
+    }
+
+    @GetMapping("/calculate/{studentId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FINANCE_STAFF')")
+    @Operation(summary = "Calculate student tuition balance by ID", description = "Finance Staff & Admin compute tuition fee balance, paid history, and status for any student.")
+    public ResponseEntity<ApiResponse<com.rupp.payment.dto.response.TuitionCalculationResponse>> calculateStudentTuition(@PathVariable Long studentId) {
+        com.rupp.payment.dto.response.TuitionCalculationResponse response = tuitionFeeService.calculateStudentTuition(studentId);
+        return ResponseEntity.ok(ApiResponse.success("Tuition calculation completed successfully", response));
+    }
+
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Create tuition fee structure", description = "Admin sets up a new tuition fee structure for a faculty and academic year.")

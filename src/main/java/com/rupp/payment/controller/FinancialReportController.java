@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -48,5 +49,22 @@ public class FinancialReportController {
     public ResponseEntity<ApiResponse<List<PaymentMethodReport>>> getPaymentMethodReports() {
         List<PaymentMethodReport> report = financialReportService.getPaymentMethodReports();
         return ResponseEntity.ok(ApiResponse.success("Payment method report generated successfully", report));
+    }
+
+    @GetMapping("/daily-revenue")
+    @Operation(summary = "Generate daily revenue report", description = "Finance Staff & Admin view daily aggregated revenue metrics and transaction volumes.")
+    public ResponseEntity<ApiResponse<List<com.rupp.payment.dto.response.DailyRevenueReport>>> getDailyRevenue(
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate) {
+        List<com.rupp.payment.dto.response.DailyRevenueReport> report = financialReportService.getDailyRevenueReports(startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success("Daily revenue report generated successfully", report));
+    }
+
+    @GetMapping("/monthly-revenue")
+    @Operation(summary = "Generate monthly revenue report", description = "Finance Staff & Admin view monthly aggregated revenue metrics for a given year.")
+    public ResponseEntity<ApiResponse<List<com.rupp.payment.dto.response.MonthlyRevenueReport>>> getMonthlyRevenue(
+            @RequestParam(required = false) Integer year) {
+        List<com.rupp.payment.dto.response.MonthlyRevenueReport> report = financialReportService.getMonthlyRevenueReports(year);
+        return ResponseEntity.ok(ApiResponse.success("Monthly revenue report generated successfully", report));
     }
 }

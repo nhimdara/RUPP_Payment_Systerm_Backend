@@ -2,6 +2,8 @@ package com.rupp.payment.service;
 
 import com.rupp.payment.dto.request.CreateTuitionFeeRequest;
 import com.rupp.payment.dto.request.UpdateTuitionFeeRequest;
+import com.rupp.payment.dto.response.PaymentResponse;
+import com.rupp.payment.dto.response.TuitionCalculationResponse;
 import com.rupp.payment.dto.response.TuitionFeeResponse;
 import com.rupp.payment.entity.*;
 import com.rupp.payment.exception.BadRequestException;
@@ -83,6 +85,84 @@ public class TuitionFeeService {
         ));
 
         return TuitionFeeResponse.fromEntity(fee);
+    }
+
+    @Transactional(readOnly = true)
+    public TuitionCalculationResponse calculateMyTuition(User currentUser) {
+        Student student = studentRepository.findByUser(currentUser)
+                .orElseThrow(() -> new ResourceNotFoundException("No student profile found for user: " + currentUser.getUsername()));
+        return calculateTuitionForStudent(student);
+    }
+
+    @Transactional(readOnly = true)
+    public TuitionCalculationResponse calculateStudentTuition(Long studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
+        return calculateTuitionForStudent(student);
+    }
+
+    private TuitionCalculationResponse calculateTuitionForStudent(Student student) {
+        if (student.getFaculty() == null || student.getAcademicYear() == null) {
+            throw new BadRequestException("You have not selected your faculty or academic year yet. Please select your academic info first.");
+        }
+
+        TuitionFeeStructure fee = tuitionFeeRepository.findByFacultyIdAndAcademicYearId(
+                student.getFaculty().getId(),
+                student.getAcademicYear().getId()
+        ).orElseThrow(() -> new ResourceNotFoundException(
+                "No tuition fee structure found for faculty: " + student.getFaculty().getFacultyName() +
+                        " and academic year: " + student.getAcademicYear().getYearLabel()
+        ));
+
+        List<Payment> payments = paymentRepository.findByStudentIdAndFeeStructureId(student.getId(), fee.getId());
+
+        java.math.BigDecimal totalTuitionFee = fee.getTotalAmount();
+        java.math.BigDecimal totalPaid = payments.stream()
+                .filter(p -> p.getStatus() == PaymentStatus.CONFIRMED)
+                .map(Payment::getTotalPaid)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
+        java.math.BigDecimal remainingBalance = totalTuitionFee.subtract(totalPaid);
+        if (remainingBalance.compareTo(java.math.BigDecimal.ZERO) < 0) {
+            remainingBalance = java.math.BigDecimal.ZERO;
+        }
+
+        boolean fullyPaid = remainingBalance.compareTo(java.math.BigDecimal.ZERO) == 0 && totalPaid.compareTo(java.math.BigDecimal.ZERO) > 0;
+        String status;
+        if (totalPaid.compareTo(java.math.BigDecimal.ZERO) == 0) {
+            status = "UNPAID";
+        } else if (remainingBalance.compareTo(java.math.BigDecimal.ZERO) == 0) {
+            status = "PAID";
+        } else {
+            status = "PARTIAL";
+        }
+
+        List<PaymentResponse> paymentHistory = payments.stream()
+                .map(PaymentResponse::fromEntity)
+                .collect(Collectors.toList());
+
+        String studentName = (student.getFirstName() != null ? student.getFirstName() : "") +
+                (student.getLastName() != null ? " " + student.getLastName() : "");
+        String email = student.getUser() != null ? student.getUser().getEmail() : "";
+        String facultyName = student.getFaculty() != null ? student.getFaculty().getFacultyName() : "";
+        String academicYear = student.getAcademicYear() != null ? student.getAcademicYear().getYearLabel() : "";
+        String majorName = student.getMajor() != null ? student.getMajor().getMajorName() : "General";
+
+        return new TuitionCalculationResponse(
+                student.getId(),
+                studentName.trim(),
+                email,
+                facultyName,
+                academicYear,
+                majorName,
+                totalTuitionFee,
+                totalPaid,
+                remainingBalance,
+                fullyPaid,
+                status,
+                fee.getDueDate(),
+                paymentHistory
+        );
     }
 
     @Transactional

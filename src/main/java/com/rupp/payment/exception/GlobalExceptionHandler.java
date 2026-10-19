@@ -21,6 +21,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ApiResponse.error(ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler({DuplicateResourceException.class, ConflictException.class, DuplicatePaymentException.class})
+    public ResponseEntity<ApiResponse<Void>> handleConflictException(RuntimeException ex) {
+        return new ResponseEntity<>(ApiResponse.error(ex.getMessage()), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadRequestException(BadRequestException ex) {
         return new ResponseEntity<>(ApiResponse.error(ex.getMessage()), HttpStatus.BAD_REQUEST);

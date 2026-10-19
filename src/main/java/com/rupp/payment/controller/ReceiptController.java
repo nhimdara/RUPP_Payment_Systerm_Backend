@@ -64,4 +64,31 @@ public class ReceiptController {
         ReceiptResponse response = receiptService.getReceiptByNumber(receiptNumber, currentUser);
         return ResponseEntity.ok(ApiResponse.success("Receipt fetched successfully", response));
     }
+
+    @GetMapping(value = "/{id}/pdf", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
+    @Operation(summary = "Export receipt as PDF", description = "Generates and exports an official receipt as a styled PDF document.")
+    public ResponseEntity<byte[]> exportReceiptPdf(@PathVariable Long id) {
+        User currentUser = authService.getCurrentAuthenticatedUser();
+        byte[] pdfBytes = receiptService.generateReceiptPdf(id, currentUser);
+        com.rupp.payment.entity.Receipt receipt = receiptService.getReceiptEntity(id, currentUser);
+        String filename = "receipt-" + receipt.getReceiptNumber() + ".pdf";
+
+        return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                .body(pdfBytes);
+    }
+
+    @GetMapping(value = "/payment/{paymentId}/pdf", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
+    @Operation(summary = "Export receipt for payment as PDF", description = "Generates and exports an official receipt PDF for a given payment ID.")
+    public ResponseEntity<byte[]> exportReceiptPdfByPaymentId(@PathVariable Long paymentId) {
+        User currentUser = authService.getCurrentAuthenticatedUser();
+        byte[] pdfBytes = receiptService.generateReceiptPdfByPaymentId(paymentId, currentUser);
+        String filename = "receipt-payment-" + paymentId + ".pdf";
+
+        return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                .body(pdfBytes);
+    }
 }

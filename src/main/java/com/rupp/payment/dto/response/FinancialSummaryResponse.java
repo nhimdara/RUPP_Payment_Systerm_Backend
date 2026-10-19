@@ -8,6 +8,8 @@ public class FinancialSummaryResponse {
 
     private BigDecimal totalRevenue;
     private BigDecimal totalPendingAmount;
+    private BigDecimal todayRevenue;
+    private BigDecimal currentMonthRevenue;
     private long totalTransactions;
     private long confirmedCount;
     private long pendingCount;
@@ -16,10 +18,14 @@ public class FinancialSummaryResponse {
     private long refundedCount;
     private Map<String, FacultyStat> facultyBreakdown = new HashMap<>();
     private Map<String, MethodStat> methodBreakdown = new HashMap<>();
+    private java.util.List<DailyRevenueReport> dailyBreakdown = new java.util.ArrayList<>();
+    private java.util.List<MonthlyRevenueReport> monthlyBreakdown = new java.util.ArrayList<>();
 
     public FinancialSummaryResponse() {
         this.totalRevenue = BigDecimal.ZERO;
         this.totalPendingAmount = BigDecimal.ZERO;
+        this.todayRevenue = BigDecimal.ZERO;
+        this.currentMonthRevenue = BigDecimal.ZERO;
     }
 
     public static class FacultyStat {
@@ -158,5 +164,37 @@ public class FinancialSummaryResponse {
 
     public void setMethodBreakdown(Map<String, MethodStat> methodBreakdown) {
         this.methodBreakdown = methodBreakdown;
+    }
+
+    public BigDecimal getTodayRevenue() {
+        return todayRevenue;
+    }
+
+    public void setTodayRevenue(BigDecimal todayRevenue) {
+        this.todayRevenue = todayRevenue;
+    }
+
+    public BigDecimal getCurrentMonthRevenue() {
+        return currentMonthRevenue;
+    }
+
+    public void setCurrentMonthRevenue(BigDecimal currentMonthRevenue) {
+        this.currentMonthRevenue = currentMonthRevenue;
+    }
+
+    public java.util.List<DailyRevenueReport> getDailyBreakdown() {
+        return dailyBreakdown;
+    }
+
+    public void setDailyBreakdown(java.util.List<DailyRevenueReport> dailyBreakdown) {
+        this.dailyBreakdown = dailyBreakdown;
+    }
+
+    public java.util.List<MonthlyRevenueReport> getMonthlyBreakdown() {
+        return monthlyBreakdown;
+    }
+
+    public void setMonthlyBreakdown(java.util.List<MonthlyRevenueReport> monthlyBreakdown) {
+        this.monthlyBreakdown = monthlyBreakdown;
     }
 }

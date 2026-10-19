@@ -29,10 +29,13 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final AuthService authService;
+    private final com.rupp.payment.service.ReceiptService receiptService;
 
-    public PaymentController(PaymentService paymentService, AuthService authService) {
+    public PaymentController(PaymentService paymentService, AuthService authService,
+                             com.rupp.payment.service.ReceiptService receiptService) {
         this.paymentService = paymentService;
         this.authService = authService;
+        this.receiptService = receiptService;
     }
 
     @PostMapping
@@ -99,5 +102,19 @@ public class PaymentController {
     public ResponseEntity<ApiResponse<ReceiptResponse>> getPaymentReceipt(@PathVariable Long id) {
         ReceiptResponse response = paymentService.getReceiptByPaymentId(id);
         return ResponseEntity.ok(ApiResponse.success("Receipt retrieved successfully", response));
+    }
+
+    @GetMapping(value = "/{id}/receipt/pdf", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FINANCE_STAFF', 'ROLE_STUDENT')")
+    @Operation(summary = "Export payment receipt as PDF", description = "Generates and exports the official receipt PDF for a payment.")
+    public ResponseEntity<byte[]> getPaymentReceiptPdf(@PathVariable Long id) {
+        User currentUser = authService.getCurrentAuthenticatedUser();
+        byte[] pdfBytes = receiptService.generateReceiptPdfByPaymentId(id, currentUser);
+        String filename = "receipt-payment-" + id + ".pdf";
+
+        return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                .body(pdfBytes);
     }
 }

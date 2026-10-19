@@ -34,6 +34,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, JpaSpec
 
     boolean existsByFeeStructureId(Long feeStructureId);
 
+    List<Payment> findByStatus(PaymentStatus status);
+
+    List<Payment> findByStatusAndPaymentDateBetween(PaymentStatus status, LocalDateTime startDate, LocalDateTime endDate);
+
     long countByStatus(PaymentStatus status);
 
     @Query("SELECT COALESCE(SUM(p.totalPaid), 0) FROM Payment p WHERE p.status = :status")

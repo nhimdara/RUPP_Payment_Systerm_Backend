@@ -3,7 +3,12 @@ package com.rupp.payment.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "students")
+@Table(name = "students", indexes = {
+        @Index(name = "idx_students_user", columnList = "user_id"),
+        @Index(name = "idx_students_faculty", columnList = "faculty_id"),
+        @Index(name = "idx_students_academic_year", columnList = "academic_year_id"),
+        @Index(name = "idx_students_major", columnList = "major_id")
+})
 public class Student {
 
     @Id

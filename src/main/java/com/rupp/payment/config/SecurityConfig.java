@@ -76,6 +76,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/tuition-fees/**").hasAuthority("ROLE_ADMIN")
                         // Payment endpoints
                         .requestMatchers(HttpMethod.POST, "/api/v1/payments").hasAuthority("ROLE_STUDENT")
+                        .requestMatchers("/api/v1/payments/*/verification/**", "/api/v1/payments/verification/**").hasAuthority("ROLE_STUDENT")
                         .requestMatchers("/api/v1/payments/my-payments", "/api/v1/payments/my-history").hasAuthority("ROLE_STUDENT")
                         .requestMatchers(HttpMethod.GET, "/api/v1/payments/{id}", "/api/v1/payments/{id}/status", "/api/v1/payments/statuses").authenticated()
                         .requestMatchers("/api/v1/payments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_FINANCE_STAFF")
