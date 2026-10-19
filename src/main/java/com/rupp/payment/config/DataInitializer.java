@@ -45,7 +45,7 @@ public class DataInitializer implements CommandLineRunner {
         // Seed Faculties if none exist
         Faculty csFaculty = facultyRepository.findByFacultyName("Computer Science")
                 .orElseGet(() -> facultyRepository.save(new Faculty("Computer Science", "Faculty of Science")));
-        Faculty teFaculty = facultyRepository.findByFacultyName("Telecommunication Engineering")
+        facultyRepository.findByFacultyName("Telecommunication Engineering")
                 .orElseGet(() -> facultyRepository.save(new Faculty("Telecommunication Engineering", "Faculty of Engineering")));
 
         // Seed Academic Years if none exist
