@@ -55,43 +55,49 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+        String normalizedUsername = request.getUsername().trim();
+        String normalizedEmail = request.getEmail().trim().toLowerCase();
+
+        if (userRepository.existsByUsername(normalizedUsername)) {
             throw new BadRequestException("Username is already taken");
         }
 
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(normalizedEmail)) {
             throw new BadRequestException("Email is already in use");
         }
 
-        Role role = request.getRole() != null ? request.getRole() : Role.ROLE_STUDENT;
+        // Public registration always assigns ROLE_STUDENT to prevent privilege escalation.
+        // Administrative accounts (ROLE_ADMIN, ROLE_FINANCE_STAFF) must be created by an Admin via /api/v1/users.
+        Role role = Role.ROLE_STUDENT;
 
         User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
+        user.setUsername(normalizedUsername);
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(role);
 
         User savedUser = userRepository.save(user);
 
-        // If registered as student or student details provided, create student profile
-        if (role == Role.ROLE_STUDENT || request.getFirstName() != null) {
-            Student student = new Student();
-            student.setUser(savedUser);
-            student.setFirstName(request.getFirstName() != null ? request.getFirstName() : savedUser.getUsername());
-            student.setLastName(request.getLastName() != null ? request.getLastName() : "");
+        // Create student profile
+        Student student = new Student();
+        student.setUser(savedUser);
+        student.setFirstName(request.getFirstName() != null && !request.getFirstName().isBlank()
+                ? request.getFirstName().trim() : savedUser.getUsername());
+        student.setLastName(request.getLastName() != null ? request.getLastName().trim() : "");
 
-            if (request.getFacultyId() != null) {
-                Faculty faculty = facultyRepository.findById(request.getFacultyId()).orElse(null);
-                student.setFaculty(faculty);
-            }
-
-            if (request.getAcademicYearId() != null) {
-                AcademicYear academicYear = academicYearRepository.findById(request.getAcademicYearId()).orElse(null);
-                student.setAcademicYear(academicYear);
-            }
-
-            studentRepository.save(student);
+        if (request.getFacultyId() != null) {
+            Faculty faculty = facultyRepository.findById(request.getFacultyId())
+                    .orElseThrow(() -> new BadRequestException("Faculty not found with id: " + request.getFacultyId()));
+            student.setFaculty(faculty);
         }
+
+        if (request.getAcademicYearId() != null) {
+            AcademicYear academicYear = academicYearRepository.findById(request.getAcademicYearId())
+                    .orElseThrow(() -> new BadRequestException("Academic year not found with id: " + request.getAcademicYearId()));
+            student.setAcademicYear(academicYear);
+        }
+
+        studentRepository.save(student);
 
         String accessToken = tokenProvider.generateAccessToken(
                 savedUser.getUsername(),
@@ -160,11 +166,11 @@ public class AuthService {
 
     public User getCurrentAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
             throw new BadRequestException("No authenticated user found");
         }
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         return userRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userDetails.getId()));
     }

@@ -29,6 +29,10 @@ public class Student {
     @JoinColumn(name = "academic_year_id")
     private AcademicYear academicYear;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "major_id")
+    private Major major;
+
     public Student() {
     }
 
@@ -41,12 +45,31 @@ public class Student {
         this.academicYear = academicYear;
     }
 
+    public Student(Long id, User user, String firstName, String lastName, Faculty faculty, AcademicYear academicYear, Major major) {
+        this.id = id;
+        this.user = user;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.faculty = faculty;
+        this.academicYear = academicYear;
+        this.major = major;
+    }
+
     public Student(User user, String firstName, String lastName, Faculty faculty, AcademicYear academicYear) {
         this.user = user;
         this.firstName = firstName;
         this.lastName = lastName;
         this.faculty = faculty;
         this.academicYear = academicYear;
+    }
+
+    public Student(User user, String firstName, String lastName, Faculty faculty, AcademicYear academicYear, Major major) {
+        this.user = user;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.faculty = faculty;
+        this.academicYear = academicYear;
+        this.major = major;
     }
 
     public Long getId() {
@@ -95,5 +118,13 @@ public class Student {
 
     public void setAcademicYear(AcademicYear academicYear) {
         this.academicYear = academicYear;
+    }
+
+    public Major getMajor() {
+        return major;
+    }
+
+    public void setMajor(Major major) {
+        this.major = major;
     }
 }

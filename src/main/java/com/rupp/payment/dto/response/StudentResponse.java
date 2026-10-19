@@ -11,17 +11,19 @@ public class StudentResponse {
     private String lastName;
     private Faculty faculty;
     private AcademicYear academicYear;
+    private MajorResponse major;
 
     public StudentResponse() {
     }
 
-    public StudentResponse(Long id, UserResponse user, String firstName, String lastName, Faculty faculty, AcademicYear academicYear) {
+    public StudentResponse(Long id, UserResponse user, String firstName, String lastName, Faculty faculty, AcademicYear academicYear, MajorResponse major) {
         this.id = id;
         this.user = user;
         this.firstName = firstName;
         this.lastName = lastName;
         this.faculty = faculty;
         this.academicYear = academicYear;
+        this.major = major;
     }
 
     public static StudentResponse fromEntity(Student student) {
@@ -32,7 +34,8 @@ public class StudentResponse {
                 student.getFirstName(),
                 student.getLastName(),
                 student.getFaculty(),
-                student.getAcademicYear()
+                student.getAcademicYear(),
+                MajorResponse.fromEntity(student.getMajor())
         );
     }
 
@@ -82,5 +85,13 @@ public class StudentResponse {
 
     public void setAcademicYear(AcademicYear academicYear) {
         this.academicYear = academicYear;
+    }
+
+    public MajorResponse getMajor() {
+        return major;
+    }
+
+    public void setMajor(MajorResponse major) {
+        this.major = major;
     }
 }

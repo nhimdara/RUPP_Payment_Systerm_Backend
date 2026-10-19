@@ -18,6 +18,8 @@ public class CreateStudentRequest {
 
     private Long academicYearId;
 
+    private Long majorId;
+
     public CreateStudentRequest() {
     }
 
@@ -67,5 +69,13 @@ public class CreateStudentRequest {
 
     public void setAcademicYearId(Long academicYearId) {
         this.academicYearId = academicYearId;
+    }
+
+    public Long getMajorId() {
+        return majorId;
+    }
+
+    public void setMajorId(Long majorId) {
+        this.majorId = majorId;
     }
 }

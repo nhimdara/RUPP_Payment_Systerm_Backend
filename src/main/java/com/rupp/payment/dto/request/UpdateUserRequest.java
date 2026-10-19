@@ -10,6 +10,7 @@ public class UpdateUserRequest {
     @Email
     private String email;
 
+    @jakarta.validation.constraints.Size(min = 6, message = "Password must have at least 6 characters")
     private String password;
 
     private Role role;
