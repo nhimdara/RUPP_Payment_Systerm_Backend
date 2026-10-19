@@ -1,8 +1,13 @@
 package com.rupp.payment.dto.request;
 
+import jakarta.validation.constraints.Size;
+
 public class UpdateStudentRequest {
 
+    @Size(max = 50, message = "First name cannot exceed 50 characters")
     private String firstName;
+
+    @Size(max = 50, message = "Last name cannot exceed 50 characters")
     private String lastName;
     private Long facultyId;
     private Long academicYearId;

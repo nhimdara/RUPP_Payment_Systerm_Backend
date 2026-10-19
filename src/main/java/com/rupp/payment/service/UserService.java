@@ -6,6 +6,7 @@ import com.rupp.payment.dto.response.UserResponse;
 import com.rupp.payment.entity.Role;
 import com.rupp.payment.entity.User;
 import com.rupp.payment.exception.BadRequestException;
+import com.rupp.payment.exception.DuplicateResourceException;
 import com.rupp.payment.exception.ResourceNotFoundException;
 import com.rupp.payment.repository.StudentRepository;
 import com.rupp.payment.repository.UserRepository;
@@ -52,10 +53,10 @@ public class UserService {
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new BadRequestException("Username is already taken");
+            throw new DuplicateResourceException("Username '" + request.getUsername() + "' is already taken");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new BadRequestException("Email is already in use");
+            throw new DuplicateResourceException("Email '" + request.getEmail() + "' is already in use");
         }
 
         User user = new User();

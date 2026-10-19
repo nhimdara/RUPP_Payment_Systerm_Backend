@@ -2,6 +2,7 @@ package com.rupp.payment.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class CreateStudentRequest {
 
@@ -9,9 +10,11 @@ public class CreateStudentRequest {
     private Long userId;
 
     @NotBlank(message = "First name is required")
+    @Size(max = 50, message = "First name cannot exceed 50 characters")
     private String firstName;
 
     @NotBlank(message = "Last name is required")
+    @Size(max = 50, message = "Last name cannot exceed 50 characters")
     private String lastName;
 
     private Long facultyId;
