@@ -36,3 +36,4 @@ public class PaymentStatusResponse {
         this.statusName = statusName;
     }
 }
+
