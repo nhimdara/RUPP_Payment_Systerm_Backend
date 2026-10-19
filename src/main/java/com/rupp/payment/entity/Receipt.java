@@ -1,9 +1,6 @@
 package com.rupp.payment.entity;
 
-<<<<<<< HEAD
-=======
 import com.fasterxml.jackson.annotation.JsonIgnore;
->>>>>>> origin/feature/search
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,14 +14,9 @@ public class Receipt {
     @Column(name = "receipt_id")
     private Long id;
 
-<<<<<<< HEAD
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "payment_id", nullable = false, unique = true)
-=======
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id", nullable = false, unique = true)
     @JsonIgnore
->>>>>>> origin/feature/search
     private Payment payment;
 
     @Column(name = "receipt_number", nullable = false, unique = true, length = 100)

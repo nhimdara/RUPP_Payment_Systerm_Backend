@@ -23,15 +23,9 @@ public class Payment {
     @JoinColumn(name = "fee_structure_id", nullable = false)
     private TuitionFeeStructure feeStructure;
 
-<<<<<<< HEAD
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "payment_status_id", nullable = false)
-    private PaymentStatus paymentStatus;
-=======
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false, length = 30)
     private PaymentStatus status;
->>>>>>> origin/feature/search
 
     @Column(name = "payment_date", nullable = false)
     private LocalDateTime paymentDate;
@@ -39,21 +33,6 @@ public class Payment {
     @Column(name = "total_paid", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalPaid;
 
-<<<<<<< HEAD
-    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<PaymentDetail> paymentDetails = new ArrayList<>();
-
-    public Payment() {
-    }
-
-    public Payment(Student student, TuitionFeeStructure feeStructure, PaymentStatus paymentStatus,
-                   LocalDateTime paymentDate, BigDecimal totalPaid) {
-        this.student = student;
-        this.feeStructure = feeStructure;
-        this.paymentStatus = paymentStatus;
-        this.paymentDate = paymentDate;
-        this.totalPaid = totalPaid;
-=======
     @Column(name = "remarks", length = 500)
     private String remarks;
 
@@ -84,7 +63,6 @@ public class Payment {
     public void removeDetail(PaymentDetail detail) {
         details.remove(detail);
         detail.setPayment(null);
->>>>>>> origin/feature/search
     }
 
     public Long getId() {
@@ -111,21 +89,12 @@ public class Payment {
         this.feeStructure = feeStructure;
     }
 
-<<<<<<< HEAD
-    public PaymentStatus getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public void setPaymentStatus(PaymentStatus paymentStatus) {
-        this.paymentStatus = paymentStatus;
-=======
     public PaymentStatus getStatus() {
         return status;
     }
 
     public void setStatus(PaymentStatus status) {
         this.status = status;
->>>>>>> origin/feature/search
     }
 
     public LocalDateTime getPaymentDate() {
@@ -144,19 +113,6 @@ public class Payment {
         this.totalPaid = totalPaid;
     }
 
-<<<<<<< HEAD
-    public List<PaymentDetail> getPaymentDetails() {
-        return paymentDetails;
-    }
-
-    public void setPaymentDetails(List<PaymentDetail> paymentDetails) {
-        this.paymentDetails = paymentDetails;
-    }
-
-    public void addPaymentDetail(PaymentDetail detail) {
-        paymentDetails.add(detail);
-        detail.setPayment(this);
-=======
     public String getRemarks() {
         return remarks;
     }
@@ -182,6 +138,5 @@ public class Payment {
         if (receipt != null) {
             receipt.setPayment(this);
         }
->>>>>>> origin/feature/search
     }
 }

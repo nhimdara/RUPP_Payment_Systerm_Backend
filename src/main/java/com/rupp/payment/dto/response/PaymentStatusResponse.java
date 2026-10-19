@@ -19,7 +19,7 @@ public class PaymentStatusResponse {
 
     public static PaymentStatusResponse fromEntity(PaymentStatus status) {
         if (status == null) return null;
-        return new PaymentStatusResponse(status.getId(), status.getStatusName());
+        return new PaymentStatusResponse((long) status.ordinal(), status.name());
     }
 
     public Long getId() {

@@ -1,10 +1,7 @@
 package com.rupp.payment.entity;
 
 import jakarta.persistence.*;
-<<<<<<< HEAD
 import java.time.LocalDate;
-=======
->>>>>>> origin/feature/search
 
 @Entity
 @Table(name = "semesters")
@@ -15,23 +12,16 @@ public class Semester {
     @Column(name = "semester_id")
     private Long id;
 
-<<<<<<< HEAD
     @Column(name = "semester_name", nullable = false)
     private String semesterName;
 
     @Column(name = "semester_number", nullable = false)
     private Integer semesterNumber;
 
-=======
-    @Column(name = "semester_name", nullable = false, length = 100)
-    private String semesterName;
-
->>>>>>> origin/feature/search
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "academic_year_id", nullable = false)
     private AcademicYear academicYear;
 
-<<<<<<< HEAD
     @Column(name = "start_date")
     private LocalDate startDate;
 
@@ -63,20 +53,6 @@ public class Semester {
         this.startDate = startDate;
         this.endDate = endDate;
         this.isActive = isActive != null ? isActive : false;
-=======
-    public Semester() {
-    }
-
-    public Semester(String semesterName, AcademicYear academicYear) {
-        this.semesterName = semesterName;
-        this.academicYear = academicYear;
-    }
-
-    public Semester(Long id, String semesterName, AcademicYear academicYear) {
-        this.id = id;
-        this.semesterName = semesterName;
-        this.academicYear = academicYear;
->>>>>>> origin/feature/search
     }
 
     public Long getId() {
@@ -95,7 +71,6 @@ public class Semester {
         this.semesterName = semesterName;
     }
 
-<<<<<<< HEAD
     public Integer getSemesterNumber() {
         return semesterNumber;
     }
@@ -104,8 +79,6 @@ public class Semester {
         this.semesterNumber = semesterNumber;
     }
 
-=======
->>>>>>> origin/feature/search
     public AcademicYear getAcademicYear() {
         return academicYear;
     }
@@ -113,7 +86,6 @@ public class Semester {
     public void setAcademicYear(AcademicYear academicYear) {
         this.academicYear = academicYear;
     }
-<<<<<<< HEAD
 
     public LocalDate getStartDate() {
         return startDate;
@@ -138,6 +110,4 @@ public class Semester {
     public void setIsActive(Boolean active) {
         isActive = active != null ? active : false;
     }
-=======
->>>>>>> origin/feature/search
 }

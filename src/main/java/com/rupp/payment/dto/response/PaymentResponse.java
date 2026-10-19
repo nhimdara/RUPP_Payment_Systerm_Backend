@@ -1,32 +1,17 @@
 package com.rupp.payment.dto.response;
 
 import com.rupp.payment.entity.Payment;
-<<<<<<< HEAD
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-=======
 import com.rupp.payment.entity.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
->>>>>>> origin/feature/search
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class PaymentResponse {
 
     private Long id;
-<<<<<<< HEAD
-    private StudentResponse student;
-    private TuitionFeeResponse feeStructure;
-    private PaymentStatusResponse paymentStatus;
-    private LocalDateTime paymentDate;
-    private BigDecimal totalPaid;
-    private List<PaymentDetailResponse> paymentDetails;
-    private Boolean hasReceipt;
-    private Long receiptId;
-=======
     private Long studentId;
     private String studentName;
     private String studentEmail;
@@ -40,56 +25,10 @@ public class PaymentResponse {
     private String remarks;
     private List<PaymentDetailResponse> details = new ArrayList<>();
     private ReceiptResponse receipt;
->>>>>>> origin/feature/search
 
     public PaymentResponse() {
     }
 
-<<<<<<< HEAD
-    public PaymentResponse(Long id, StudentResponse student, TuitionFeeResponse feeStructure,
-                           PaymentStatusResponse paymentStatus, LocalDateTime paymentDate,
-                           BigDecimal totalPaid, List<PaymentDetailResponse> paymentDetails,
-                           Boolean hasReceipt, Long receiptId) {
-        this.id = id;
-        this.student = student;
-        this.feeStructure = feeStructure;
-        this.paymentStatus = paymentStatus;
-        this.paymentDate = paymentDate;
-        this.totalPaid = totalPaid;
-        this.paymentDetails = paymentDetails;
-        this.hasReceipt = hasReceipt;
-        this.receiptId = receiptId;
-    }
-
-    public static PaymentResponse fromEntity(Payment payment) {
-        if (payment == null) return null;
-        List<PaymentDetailResponse> details = null;
-        if (payment.getPaymentDetails() != null) {
-            details = payment.getPaymentDetails().stream()
-                    .map(PaymentDetailResponse::fromEntity)
-                    .collect(Collectors.toList());
-        }
-
-        return new PaymentResponse(
-                payment.getId(),
-                payment.getStudent() != null ? StudentResponse.fromEntity(payment.getStudent()) : null,
-                payment.getFeeStructure() != null ? TuitionFeeResponse.fromEntity(payment.getFeeStructure()) : null,
-                payment.getPaymentStatus() != null ? PaymentStatusResponse.fromEntity(payment.getPaymentStatus()) : null,
-                payment.getPaymentDate(),
-                payment.getTotalPaid(),
-                details,
-                false,
-                null
-        );
-    }
-
-    public static PaymentResponse fromEntity(Payment payment, Long receiptId) {
-        PaymentResponse response = fromEntity(payment);
-        if (response != null && receiptId != null) {
-            response.setHasReceipt(true);
-            response.setReceiptId(receiptId);
-        }
-=======
     public static PaymentResponse from(Payment payment) {
         PaymentResponse response = new PaymentResponse();
         response.setId(payment.getId());
@@ -131,7 +70,6 @@ public class PaymentResponse {
             ));
         }
 
->>>>>>> origin/feature/search
         return response;
     }
 
@@ -143,30 +81,6 @@ public class PaymentResponse {
         this.id = id;
     }
 
-<<<<<<< HEAD
-    public StudentResponse getStudent() {
-        return student;
-    }
-
-    public void setStudent(StudentResponse student) {
-        this.student = student;
-    }
-
-    public TuitionFeeResponse getFeeStructure() {
-        return feeStructure;
-    }
-
-    public void setFeeStructure(TuitionFeeResponse feeStructure) {
-        this.feeStructure = feeStructure;
-    }
-
-    public PaymentStatusResponse getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public void setPaymentStatus(PaymentStatusResponse paymentStatus) {
-        this.paymentStatus = paymentStatus;
-=======
     public Long getStudentId() {
         return studentId;
     }
@@ -229,7 +143,6 @@ public class PaymentResponse {
 
     public void setStatus(PaymentStatus status) {
         this.status = status;
->>>>>>> origin/feature/search
     }
 
     public LocalDateTime getPaymentDate() {
@@ -248,30 +161,6 @@ public class PaymentResponse {
         this.totalPaid = totalPaid;
     }
 
-<<<<<<< HEAD
-    public List<PaymentDetailResponse> getPaymentDetails() {
-        return paymentDetails;
-    }
-
-    public void setPaymentDetails(List<PaymentDetailResponse> paymentDetails) {
-        this.paymentDetails = paymentDetails;
-    }
-
-    public Boolean getHasReceipt() {
-        return hasReceipt;
-    }
-
-    public void setHasReceipt(Boolean hasReceipt) {
-        this.hasReceipt = hasReceipt;
-    }
-
-    public Long getReceiptId() {
-        return receiptId;
-    }
-
-    public void setReceiptId(Long receiptId) {
-        this.receiptId = receiptId;
-=======
     public String getRemarks() {
         return remarks;
     }
@@ -294,6 +183,5 @@ public class PaymentResponse {
 
     public void setReceipt(ReceiptResponse receipt) {
         this.receipt = receipt;
->>>>>>> origin/feature/search
     }
 }
