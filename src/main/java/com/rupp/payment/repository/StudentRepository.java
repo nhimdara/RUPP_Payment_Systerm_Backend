@@ -14,5 +14,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Optional<Student> findByUserId(Long userId);
     List<Student> findByFacultyId(Long facultyId);
     List<Student> findByAcademicYearId(Long academicYearId);
+    List<Student> findByMajorId(Long majorId);
     boolean existsByUserId(Long userId);
+    boolean existsByFacultyId(Long facultyId);
+    boolean existsByAcademicYearId(Long academicYearId);
+    boolean existsByMajorId(Long majorId);
 }

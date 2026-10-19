@@ -63,10 +63,29 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/error"
                         ).permitAll()
-                        // Student profile endpoint (accessible by any authenticated user for their profile)
+                        // Student profile and academic selection endpoints (accessible by authenticated student)
                         .requestMatchers(HttpMethod.GET, "/api/v1/students/my-profile").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/students/my-academic-info").authenticated()
                         // Student management: Admin and Finance Staff
                         .requestMatchers("/api/v1/students/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_FINANCE_STAFF")
+                        // Academic Structure: Read is open to all authenticated users; CUD requires Admin/Finance Staff
+                        .requestMatchers(HttpMethod.GET, "/api/v1/faculties/**", "/api/v1/academic-years/**", "/api/v1/majors/**", "/api/v1/semesters/**").authenticated()
+                        .requestMatchers("/api/v1/faculties/**", "/api/v1/academic-years/**", "/api/v1/majors/**", "/api/v1/semesters/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_FINANCE_STAFF")
+                        // Tuition Fee Structure: Read is open to all authenticated users; CUD requires Admin
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tuition-fees/**").authenticated()
+                        .requestMatchers("/api/v1/tuition-fees/**").hasAuthority("ROLE_ADMIN")
+                        // Payment endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/v1/payments").hasAuthority("ROLE_STUDENT")
+                        .requestMatchers("/api/v1/payments/my-payments", "/api/v1/payments/my-history").hasAuthority("ROLE_STUDENT")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payments/{id}", "/api/v1/payments/{id}/status", "/api/v1/payments/statuses").authenticated()
+                        .requestMatchers("/api/v1/payments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_FINANCE_STAFF")
+                        // Receipt endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/v1/receipts/{id}", "/api/v1/receipts/payment/**", "/api/v1/receipts/number/**").authenticated()
+                        .requestMatchers("/api/v1/receipts/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_FINANCE_STAFF")
+                        // Financial Reports: Admin and Finance Staff
+                        .requestMatchers("/api/v1/reports/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_FINANCE_STAFF")
+                        // System Monitoring: Admin only
+                        .requestMatchers("/api/v1/admin/monitoring/**").hasAuthority("ROLE_ADMIN")
                         // User management: Admin only
                         .requestMatchers("/api/v1/users/**").hasAuthority("ROLE_ADMIN")
                         // All other requests require authentication

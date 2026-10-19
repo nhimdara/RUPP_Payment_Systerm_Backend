@@ -34,11 +34,12 @@ public class StudentController {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FINANCE_STAFF')")
-    @Operation(summary = "List all students", description = "Admin & Finance Staff can list students, with optional filtering by faculty or academic year.")
+    @Operation(summary = "List all students", description = "Admin & Finance Staff can list students, with optional filtering by faculty, academic year, or major.")
     public ResponseEntity<ApiResponse<List<StudentResponse>>> getAllStudents(
             @RequestParam(required = false) Long facultyId,
-            @RequestParam(required = false) Long academicYearId) {
-        List<StudentResponse> students = studentService.getAllStudents(facultyId, academicYearId);
+            @RequestParam(required = false) Long academicYearId,
+            @RequestParam(required = false) Long majorId) {
+        List<StudentResponse> students = studentService.getAllStudents(facultyId, academicYearId, majorId);
         return ResponseEntity.ok(ApiResponse.success("Students fetched successfully", students));
     }
 
@@ -48,6 +49,15 @@ public class StudentController {
         User currentUser = authService.getCurrentAuthenticatedUser();
         StudentResponse response = studentService.getMyStudentProfile(currentUser);
         return ResponseEntity.ok(ApiResponse.success("Student profile fetched successfully", response));
+    }
+
+    @PutMapping("/my-academic-info")
+    @Operation(summary = "Select/update academic information", description = "Allows logged-in students to select or update their faculty, academic year, and major.")
+    public ResponseEntity<ApiResponse<StudentResponse>> updateMyAcademicInfo(
+            @Valid @RequestBody com.rupp.payment.dto.request.SelectAcademicInfoRequest request) {
+        User currentUser = authService.getCurrentAuthenticatedUser();
+        StudentResponse response = studentService.updateMyAcademicInfo(currentUser, request);
+        return ResponseEntity.ok(ApiResponse.success("Academic information updated successfully", response));
     }
 
     @GetMapping("/{id}")

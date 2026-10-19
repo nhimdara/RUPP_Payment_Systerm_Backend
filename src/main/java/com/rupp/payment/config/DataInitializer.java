@@ -2,11 +2,15 @@ package com.rupp.payment.config;
 
 import com.rupp.payment.entity.AcademicYear;
 import com.rupp.payment.entity.Faculty;
+import com.rupp.payment.entity.Major;
 import com.rupp.payment.entity.Role;
+import com.rupp.payment.entity.Semester;
 import com.rupp.payment.entity.Student;
 import com.rupp.payment.entity.User;
 import com.rupp.payment.repository.AcademicYearRepository;
 import com.rupp.payment.repository.FacultyRepository;
+import com.rupp.payment.repository.MajorRepository;
+import com.rupp.payment.repository.SemesterRepository;
 import com.rupp.payment.repository.StudentRepository;
 import com.rupp.payment.repository.UserRepository;
 import org.slf4j.Logger;
@@ -26,17 +30,29 @@ public class DataInitializer implements CommandLineRunner {
     private final StudentRepository studentRepository;
     private final FacultyRepository facultyRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final MajorRepository majorRepository;
+    private final SemesterRepository semesterRepository;
+    private final com.rupp.payment.repository.PaymentStatusRepository paymentStatusRepository;
+    private final com.rupp.payment.repository.TuitionFeeStructureRepository tuitionFeeRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(UserRepository userRepository,
                            StudentRepository studentRepository,
                            FacultyRepository facultyRepository,
                            AcademicYearRepository academicYearRepository,
+                           MajorRepository majorRepository,
+                           SemesterRepository semesterRepository,
+                           com.rupp.payment.repository.PaymentStatusRepository paymentStatusRepository,
+                           com.rupp.payment.repository.TuitionFeeStructureRepository tuitionFeeRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.studentRepository = studentRepository;
         this.facultyRepository = facultyRepository;
         this.academicYearRepository = academicYearRepository;
+        this.majorRepository = majorRepository;
+        this.semesterRepository = semesterRepository;
+        this.paymentStatusRepository = paymentStatusRepository;
+        this.tuitionFeeRepository = tuitionFeeRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -55,6 +71,20 @@ public class DataInitializer implements CommandLineRunner {
         academicYearRepository.findByYearLabel("2025-2026")
                 .orElseGet(() -> academicYearRepository.save(
                         new AcademicYear("2025-2026", LocalDate.of(2025, 10, 1), LocalDate.of(2026, 7, 31))));
+
+        // Seed Majors if none exist
+        if (majorRepository.count() == 0) {
+            majorRepository.save(new Major("Computer Science", "CS", csFaculty, "Department of Computer Science"));
+            majorRepository.save(new Major("Information Technology Engineering", "ITE", teFaculty, "Department of Telecom & IT"));
+            logger.info("Default Majors created: CS, ITE");
+        }
+
+        // Seed Semesters if none exist
+        if (semesterRepository.count() == 0) {
+            semesterRepository.save(new Semester("Semester 1", 1, year2025, LocalDate.of(2024, 10, 1), LocalDate.of(2025, 2, 28), true));
+            semesterRepository.save(new Semester("Semester 2", 2, year2025, LocalDate.of(2025, 3, 1), LocalDate.of(2025, 7, 31), false));
+            logger.info("Default Semesters created for 2024-2025: Semester 1 (Active), Semester 2");
+        }
 
         // Seed Admin User
         if (!userRepository.existsByUsername("admin")) {
@@ -78,6 +108,9 @@ public class DataInitializer implements CommandLineRunner {
             logger.info("Default FINANCE_STAFF user created: finance / finance123");
         }
 
+        Major csMajor = majorRepository.findByMajorCode("CS")
+                .orElseGet(() -> majorRepository.save(new Major("Computer Science", "CS", csFaculty, "Department of Computer Science")));
+
         // Seed Student User and Student Profile
         if (!userRepository.existsByUsername("student1")) {
             User studentUser = new User();
@@ -93,9 +126,46 @@ public class DataInitializer implements CommandLineRunner {
             student.setLastName("Nhim");
             student.setFaculty(csFaculty);
             student.setAcademicYear(year2025);
+            student.setMajor(csMajor);
             studentRepository.save(student);
 
             logger.info("Default STUDENT user created: student1 / student123");
+        }
+
+        // Seed Payment Statuses if none exist
+        seedPaymentStatus("PENDING");
+        seedPaymentStatus("VERIFIED");
+        seedPaymentStatus("CONFIRMED");
+        seedPaymentStatus("REJECTED");
+
+        // Seed Tuition Fee Structure for CS and 2024-2025 if none exists
+        if (!tuitionFeeRepository.existsByFacultyIdAndAcademicYearId(csFaculty.getId(), year2025.getId())) {
+            com.rupp.payment.entity.TuitionFeeStructure csFee = new com.rupp.payment.entity.TuitionFeeStructure(
+                    csFaculty,
+                    year2025,
+                    new java.math.BigDecimal("600.00"),
+                    LocalDate.of(2025, 1, 15)
+            );
+            tuitionFeeRepository.save(csFee);
+            logger.info("Default Tuition Fee Structure created for Computer Science 2024-2025: $600.00");
+        }
+
+        if (!tuitionFeeRepository.existsByFacultyIdAndAcademicYearId(teFaculty.getId(), year2025.getId())) {
+            com.rupp.payment.entity.TuitionFeeStructure teFee = new com.rupp.payment.entity.TuitionFeeStructure(
+                    teFaculty,
+                    year2025,
+                    new java.math.BigDecimal("700.00"),
+                    LocalDate.of(2025, 1, 15)
+            );
+            tuitionFeeRepository.save(teFee);
+            logger.info("Default Tuition Fee Structure created for Telecommunication Engineering 2024-2025: $700.00");
+        }
+    }
+
+    private void seedPaymentStatus(String statusName) {
+        if (!paymentStatusRepository.existsByStatusName(statusName)) {
+            paymentStatusRepository.save(new com.rupp.payment.entity.PaymentStatus(statusName));
+            logger.info("Default PaymentStatus created: {}", statusName);
         }
     }
 }
