@@ -36,3 +36,8 @@ build/
 .venv/
 *.pyc
 __pycache__/
+
+### H2 Local Database ###
+*.mv.db
+*.trace.db
+
