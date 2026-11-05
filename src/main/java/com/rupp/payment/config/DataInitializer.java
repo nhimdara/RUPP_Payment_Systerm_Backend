@@ -26,6 +26,7 @@ public class DataInitializer implements CommandLineRunner {
     private final TuitionFeeStructureRepository feeStructureRepository;
     private final PaymentRepository paymentRepository;
     private final ReceiptRepository receiptRepository;
+    private final com.rupp.payment.repository.NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(UserRepository userRepository,
@@ -37,6 +38,7 @@ public class DataInitializer implements CommandLineRunner {
                            TuitionFeeStructureRepository feeStructureRepository,
                            PaymentRepository paymentRepository,
                            ReceiptRepository receiptRepository,
+                           com.rupp.payment.repository.NotificationRepository notificationRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.studentRepository = studentRepository;
@@ -47,6 +49,7 @@ public class DataInitializer implements CommandLineRunner {
         this.feeStructureRepository = feeStructureRepository;
         this.paymentRepository = paymentRepository;
         this.receiptRepository = receiptRepository;
+        this.notificationRepository = notificationRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -140,6 +143,39 @@ public class DataInitializer implements CommandLineRunner {
             logger.info("Default STUDENT user created: ayutaya / student123");
         }
 
+        Faculty teFaculty = facultyRepository.findByFacultyName("Telecommunication Engineering")
+                .orElseGet(() -> facultyRepository.save(new Faculty("Telecommunication Engineering", "Faculty of Engineering")));
+
+        Major teMajor = majorRepository.findByMajorCode("TE-01")
+                .orElseGet(() -> {
+                    Major m = new Major();
+                    m.setMajorName("Telecommunication Engineering");
+                    m.setMajorCode("TE-01");
+                    m.setFaculty(teFaculty);
+                    m.setDescription("Core Telecommunication Engineering Program");
+                    return majorRepository.save(m);
+                });
+
+        if (!userRepository.existsByUsername("leangkhai")) {
+            User studentUser = new User();
+            studentUser.setUsername("leangkhai");
+            studentUser.setEmail("leangkhai@rupp.edu.kh");
+            studentUser.setPassword(passwordEncoder.encode("student123"));
+            studentUser.setRole(Role.ROLE_STUDENT);
+            User savedUser = userRepository.save(studentUser);
+
+            Student student = new Student();
+            student.setUser(savedUser);
+            student.setFirstName("Taing");
+            student.setLastName("Leangkhai");
+            student.setFaculty(teFaculty);
+            student.setAcademicYear(year2025);
+            student.setMajor(teMajor);
+            studentRepository.save(student);
+
+            logger.info("Default STUDENT user created: leangkhai / student123");
+        }
+
         // Seed Semester if none exist
         Semester semester1 = semesterRepository.findAll().stream().findFirst()
                 .orElseGet(() -> semesterRepository.save(new Semester(
@@ -197,6 +233,53 @@ public class DataInitializer implements CommandLineRunner {
 
                 logger.info("Sample payments initialized: 1 CONFIRMED with receipt, 1 PENDING");
             });
+        }
+
+        // Seed Sample Notifications for Home Dashboard & Notifications Screen
+        if (notificationRepository.count() == 0) {
+            userRepository.findByUsername("leangkhai").ifPresent(user -> {
+                notificationRepository.save(new com.rupp.payment.entity.Notification(
+                        user,
+                        "Tuition Payment Confirmed",
+                        "Your tuition payment of $600.00 via KHQR Bakong was successfully verified. Receipt #RUPP-REC-2026-002 is ready for download.",
+                        com.rupp.payment.entity.NotificationCategory.PAYMENTS,
+                        new BigDecimal("600.00"),
+                        "RUPP-REC-2026-002"
+                ));
+                notificationRepository.save(new com.rupp.payment.entity.Notification(
+                        user,
+                        "Semester 1 Class Schedule Released",
+                        "The timetable for Year 3 Telecommunication Engineering (Shift: Morning) has been posted by the Faculty of Engineering.",
+                        com.rupp.payment.entity.NotificationCategory.ACADEMIC
+                ));
+                notificationRepository.save(new com.rupp.payment.entity.Notification(
+                        user,
+                        "Bakong KHQR Instant Payment Ready",
+                        "You can now make fee payments with zero fees across all local mobile banking apps using Bakong KHQR QR scan.",
+                        com.rupp.payment.entity.NotificationCategory.ANNOUNCEMENTS
+                ));
+                notificationRepository.save(new com.rupp.payment.entity.Notification(
+                        user,
+                        "Lab Fee Payment Recorded",
+                        "Payment of $45.00 for STEM Lab & Technology Access has been acknowledged and stamped by the RUPP Finance Office.",
+                        com.rupp.payment.entity.NotificationCategory.PAYMENTS,
+                        new BigDecimal("45.00"),
+                        "RUPP-REC-2026-001"
+                ));
+            });
+
+            userRepository.findByUsername("ayutaya").ifPresent(user -> {
+                notificationRepository.save(new com.rupp.payment.entity.Notification(
+                        user,
+                        "Tuition Payment Confirmed",
+                        "Your tuition payment was successfully verified.",
+                        com.rupp.payment.entity.NotificationCategory.PAYMENTS,
+                        new BigDecimal("600.00"),
+                        "RCP-20261019-0001"
+                ));
+            });
+
+            logger.info("Sample notifications initialized for Home & Navigation module");
         }
     }
 }

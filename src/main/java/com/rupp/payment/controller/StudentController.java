@@ -26,10 +26,12 @@ public class StudentController {
 
     private final StudentService studentService;
     private final AuthService authService;
+    private final com.rupp.payment.service.DashboardService dashboardService;
 
-    public StudentController(StudentService studentService, AuthService authService) {
+    public StudentController(StudentService studentService, AuthService authService, com.rupp.payment.service.DashboardService dashboardService) {
         this.studentService = studentService;
         this.authService = authService;
+        this.dashboardService = dashboardService;
     }
 
     @GetMapping
@@ -49,6 +51,14 @@ public class StudentController {
         User currentUser = authService.getCurrentAuthenticatedUser();
         StudentResponse response = studentService.getMyStudentProfile(currentUser);
         return ResponseEntity.ok(ApiResponse.success("Student profile fetched successfully", response));
+    }
+
+    @GetMapping("/my-profile/summary-card")
+    @Operation(summary = "Get student profile summary card", description = "Returns student credentials and dynamic tuition billing balance for the summary card.")
+    public ResponseEntity<ApiResponse<com.rupp.payment.dto.response.StudentProfileSummaryCardResponse>> getMyProfileSummaryCard() {
+        User currentUser = authService.getCurrentAuthenticatedUser();
+        com.rupp.payment.dto.response.StudentProfileSummaryCardResponse response = dashboardService.getProfileSummaryCard(currentUser);
+        return ResponseEntity.ok(ApiResponse.success("Student profile summary card fetched successfully", response));
     }
 
     @PutMapping("/my-academic-info")

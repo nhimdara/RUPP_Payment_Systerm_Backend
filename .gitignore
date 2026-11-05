@@ -36,3 +36,7 @@ build/
 .venv/
 *.pyc
 __pycache__/
+
+### Application Logs ###
+*.log
+app.log
