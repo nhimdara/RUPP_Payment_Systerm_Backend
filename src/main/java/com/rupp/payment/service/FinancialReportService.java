@@ -132,7 +132,8 @@ public class FinancialReportService {
     public List<FacultyRevenueReport> getFacultyRevenueReports() {
         Map<Long, List<Payment>> byFaculty = paymentRepository.findAll().stream()
                 .filter(payment -> payment.getStatus() == PaymentStatus.CONFIRMED)
-                .collect(Collectors.groupingBy(payment -> payment.getFeeStructure().getFaculty().getId()));
+                .filter(payment -> facultyIdOf(payment) != null)
+                .collect(Collectors.groupingBy(FinancialReportService::facultyIdOf));
         return facultyRepository.findAll().stream().map(faculty -> toFacultyReport(faculty, byFaculty.get(faculty.getId())))
                 .collect(Collectors.toList());
     }
@@ -155,5 +156,16 @@ public class FinancialReportService {
 
     private static BigDecimal value(BigDecimal amount) {
         return amount == null ? BigDecimal.ZERO : amount;
+    }
+
+    /** Tuition payments carry the faculty on their fee structure; service payments use the student's faculty. */
+    private static Long facultyIdOf(Payment payment) {
+        if (payment.getFeeStructure() != null && payment.getFeeStructure().getFaculty() != null) {
+            return payment.getFeeStructure().getFaculty().getId();
+        }
+        if (payment.getStudent() != null && payment.getStudent().getFaculty() != null) {
+            return payment.getStudent().getFaculty().getId();
+        }
+        return null;
     }
 }

@@ -40,7 +40,7 @@ public class PdfReceiptService {
             document.add(title);
 
             Font subTitleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, SECONDARY_COLOR);
-            Paragraph subTitle = new Paragraph("OFFICIAL TUITION PAYMENT RECEIPT", subTitleFont);
+            Paragraph subTitle = new Paragraph("OFFICIAL PAYMENT RECEIPT", subTitleFont);
             subTitle.setAlignment(Element.ALIGN_CENTER);
             subTitle.setSpacingAfter(8);
             document.add(subTitle);
@@ -123,7 +123,9 @@ public class PdfReceiptService {
             addTableHeader(table, "Reference", thFont);
             addTableHeader(table, "Amount (USD)", thFont);
 
-            String desc = "Tuition Fee (" + facultyName + ")";
+            String desc = (payment != null && payment.getServiceFee() != null)
+                    ? payment.getServiceFee().getName()
+                    : "Tuition Fee (" + facultyName + ")";
             if (payment != null && payment.getDetails() != null && !payment.getDetails().isEmpty()) {
                 for (PaymentDetail detail : payment.getDetails()) {
                     table.addCell(createCell(desc, Element.ALIGN_LEFT, valueFont));

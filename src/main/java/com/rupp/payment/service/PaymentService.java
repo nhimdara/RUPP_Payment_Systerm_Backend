@@ -154,7 +154,7 @@ public class PaymentService {
         );
     }
 
-    private String generateReceiptNumber(Long paymentId) {
+    static String generateReceiptNumber(Long paymentId) {
         String dateStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String suffix = String.format("%04d", paymentId % 10000);
         return "RCP-" + dateStr + "-" + suffix;

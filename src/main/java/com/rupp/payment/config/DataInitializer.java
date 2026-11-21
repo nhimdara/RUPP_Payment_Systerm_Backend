@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -27,6 +28,8 @@ public class DataInitializer implements CommandLineRunner {
     private final PaymentRepository paymentRepository;
     private final ReceiptRepository receiptRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ServiceFeeRepository serviceFeeRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     public DataInitializer(UserRepository userRepository,
                            StudentRepository studentRepository,
@@ -37,7 +40,11 @@ public class DataInitializer implements CommandLineRunner {
                            TuitionFeeStructureRepository feeStructureRepository,
                            PaymentRepository paymentRepository,
                            ReceiptRepository receiptRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           ServiceFeeRepository serviceFeeRepository,
+                           JdbcTemplate jdbcTemplate) {
+        this.serviceFeeRepository = serviceFeeRepository;
+        this.jdbcTemplate = jdbcTemplate;
         this.userRepository = userRepository;
         this.studentRepository = studentRepository;
         this.facultyRepository = facultyRepository;
@@ -197,6 +204,71 @@ public class DataInitializer implements CommandLineRunner {
 
                 logger.info("Sample payments initialized: 1 CONFIRMED with receipt, 1 PENDING");
             });
+        }
+
+        allowServicePaymentsInExistingSchema();
+        seedServiceFees();
+        backfillMissingReceipts();
+    }
+
+    /**
+     * Payments for campus services have no tuition fee structure. Hibernate's ddl-auto=update adds
+     * new columns but never relaxes NOT NULL, so older PostgreSQL databases still have
+     * payments.fee_structure_id NOT NULL. Drop it once (safe to run repeatedly).
+     */
+    private void allowServicePaymentsInExistingSchema() {
+        try {
+            String product = jdbcTemplate.execute((java.sql.Connection c) -> c.getMetaData().getDatabaseProductName());
+            if (product != null && product.toLowerCase().contains("postgres")) {
+                jdbcTemplate.execute("ALTER TABLE payments ALTER COLUMN fee_structure_id DROP NOT NULL");
+            }
+        } catch (Exception e) {
+            logger.warn("Could not relax payments.fee_structure_id NOT NULL: {}", e.getMessage());
+        }
+    }
+
+    /** Campus service fees (parking, library, lab...) valid from the start of the current month. */
+    private void seedServiceFees() {
+        LocalDate start = LocalDate.now().withDayOfMonth(1);
+        java.time.format.DateTimeFormatter label = java.time.format.DateTimeFormatter.ofPattern("MMM yyyy");
+        LocalDate semesterEnd = start.plusMonths(6).minusDays(1);
+        LocalDate yearEnd = start.plusMonths(12).minusDays(1);
+        String semesterLabel = start.format(label) + " – " + semesterEnd.format(label);
+        String yearLabel = start.format(label) + " – " + yearEnd.format(label);
+
+        seedFee(new ServiceFee("MOTO-SEM", "Moto Parking Pass (Semester)", ServiceFeeCategory.MOTO_PARKING,
+                "Unlimited motorbike parking at Campus 1 and Campus 2 for one semester.",
+                new BigDecimal("15.00"), semesterLabel, start, semesterEnd, false));
+        seedFee(new ServiceFee("LIB-YEAR", "Library Pass (Academic Year)", ServiceFeeCategory.LIBRARY,
+                "Borrowing and reading-room access at the RUPP library for one year.",
+                new BigDecimal("10.00"), yearLabel, start, yearEnd, false));
+        seedFee(new ServiceFee("LAB-SEM", "Computer Lab Access (Semester)", ServiceFeeCategory.LABORATORY,
+                "STEM computer lab and Wi-Fi lab access for one semester.",
+                new BigDecimal("25.00"), semesterLabel, start, semesterEnd, false));
+        seedFee(new ServiceFee("IDC-REPL", "Student ID Card Replacement", ServiceFeeCategory.ID_CARD,
+                "Reprint of a lost or damaged student ID card.",
+                new BigDecimal("5.00"), null, null, null, true));
+        seedFee(new ServiceFee("EXAM-RETAKE", "Exam Retake Fee (per subject)", ServiceFeeCategory.EXAM,
+                "Registration fee to retake one final exam.",
+                new BigDecimal("20.00"), null, null, null, true));
+    }
+
+    /** Earlier, POST /payments/{id}/confirm did not issue receipts. Give those confirmed payments one. */
+    private void backfillMissingReceipts() {
+        paymentRepository.findByStatus(PaymentStatus.CONFIRMED).stream()
+                .filter(p -> receiptRepository.findByPaymentId(p.getId()).isEmpty())
+                .forEach(p -> {
+                    String number = "RCP-" + p.getPaymentDate().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"))
+                            + "-" + String.format("%04d", p.getId() % 10000);
+                    receiptRepository.save(new Receipt(p, number, LocalDateTime.now(), p.getTotalPaid()));
+                    logger.info("Backfilled missing receipt {} for confirmed payment {}", number, p.getId());
+                });
+    }
+
+    private void seedFee(ServiceFee fee) {
+        if (!serviceFeeRepository.existsByCode(fee.getCode())) {
+            serviceFeeRepository.save(fee);
+            logger.info("Service fee seeded: {} (${})", fee.getName(), fee.getAmount());
         }
     }
 }

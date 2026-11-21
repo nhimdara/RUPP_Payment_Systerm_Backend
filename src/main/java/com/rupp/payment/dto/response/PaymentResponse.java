@@ -19,6 +19,11 @@ public class PaymentResponse {
     private String academicYearLabel;
     private Long feeStructureId;
     private BigDecimal feeStructureAmount;
+    /** TUITION or SERVICE */
+    private String paymentType = "TUITION";
+    private Long serviceFeeId;
+    private String serviceFeeName;
+    private String serviceFeeCategory;
     private PaymentStatus status;
     private LocalDateTime paymentDate;
     private BigDecimal totalPaid;
@@ -52,6 +57,12 @@ public class PaymentResponse {
         if (payment.getFeeStructure() != null) {
             response.setFeeStructureId(payment.getFeeStructure().getId());
             response.setFeeStructureAmount(payment.getFeeStructure().getTotalAmount());
+        }
+        if (payment.getServiceFee() != null) {
+            response.setPaymentType("SERVICE");
+            response.setServiceFeeId(payment.getServiceFee().getId());
+            response.setServiceFeeName(payment.getServiceFee().getName());
+            response.setServiceFeeCategory(payment.getServiceFee().getCategory().name());
         }
         response.setStatus(payment.getStatus());
         response.setPaymentDate(payment.getPaymentDate());
@@ -188,4 +199,13 @@ public class PaymentResponse {
     public void setReceipt(ReceiptResponse receipt) {
         this.receipt = receipt;
     }
+
+    public String getPaymentType() { return paymentType; }
+    public void setPaymentType(String paymentType) { this.paymentType = paymentType; }
+    public Long getServiceFeeId() { return serviceFeeId; }
+    public void setServiceFeeId(Long serviceFeeId) { this.serviceFeeId = serviceFeeId; }
+    public String getServiceFeeName() { return serviceFeeName; }
+    public void setServiceFeeName(String serviceFeeName) { this.serviceFeeName = serviceFeeName; }
+    public String getServiceFeeCategory() { return serviceFeeCategory; }
+    public void setServiceFeeCategory(String serviceFeeCategory) { this.serviceFeeCategory = serviceFeeCategory; }
 }

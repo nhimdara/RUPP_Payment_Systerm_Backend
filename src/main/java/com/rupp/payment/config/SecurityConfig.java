@@ -84,6 +84,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/receipts/{id}", "/api/v1/receipts/payment/**", "/api/v1/receipts/number/**").authenticated()
                         .requestMatchers("/api/v1/receipts/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_FINANCE_STAFF")
                         // Financial Reports: Admin and Finance Staff
+                        .requestMatchers(HttpMethod.GET, "/api/v1/service-fees", "/api/v1/service-fees/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/service-fees/*/pay").hasAuthority("ROLE_STUDENT")
+                        .requestMatchers("/api/v1/service-fees", "/api/v1/service-fees/**").hasAuthority("ROLE_ADMIN")
+
                         .requestMatchers("/api/v1/reports/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_FINANCE_STAFF")
                         // System Monitoring: Admin only
                         .requestMatchers("/api/v1/admin/monitoring/**").hasAuthority("ROLE_ADMIN")

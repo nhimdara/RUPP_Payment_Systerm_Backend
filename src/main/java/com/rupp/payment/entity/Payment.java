@@ -24,9 +24,15 @@ public class Payment {
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
+    /** Set for tuition payments. Null for campus service payments. */
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fee_structure_id", nullable = false)
+    @JoinColumn(name = "fee_structure_id")
     private TuitionFeeStructure feeStructure;
+
+    /** Set for campus service payments (parking, library...). Null for tuition payments. */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "service_fee_id")
+    private ServiceFee serviceFee;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false, length = 30)
@@ -92,6 +98,14 @@ public class Payment {
 
     public void setFeeStructure(TuitionFeeStructure feeStructure) {
         this.feeStructure = feeStructure;
+    }
+
+    public ServiceFee getServiceFee() {
+        return serviceFee;
+    }
+
+    public void setServiceFee(ServiceFee serviceFee) {
+        this.serviceFee = serviceFee;
     }
 
     public PaymentStatus getStatus() {

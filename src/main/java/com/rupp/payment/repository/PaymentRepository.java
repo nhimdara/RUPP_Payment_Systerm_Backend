@@ -34,6 +34,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, JpaSpec
 
     boolean existsByFeeStructureId(Long feeStructureId);
 
+    List<Payment> findByStudentIdAndServiceFeeIsNotNull(Long studentId);
+
+    List<Payment> findByStudentIdAndServiceFeeId(Long studentId, Long serviceFeeId);
+
     List<Payment> findByStatus(PaymentStatus status);
 
     List<Payment> findByStatusAndPaymentDateBetween(PaymentStatus status, LocalDateTime startDate, LocalDateTime endDate);

@@ -2,11 +2,14 @@ package com.rupp.payment.service;
 
 import com.rupp.payment.entity.Payment;
 import com.rupp.payment.entity.PaymentStatus;
+import com.rupp.payment.entity.Receipt;
 import com.rupp.payment.repository.PaymentRepository;
+import com.rupp.payment.repository.ReceiptRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -15,8 +18,11 @@ public class JpaPaymentRecords implements PaymentRecords {
 
     private final PaymentRepository paymentRepository;
 
-    public JpaPaymentRecords(PaymentRepository paymentRepository) {
+    private final ReceiptRepository receiptRepository;
+
+    public JpaPaymentRecords(PaymentRepository paymentRepository, ReceiptRepository receiptRepository) {
         this.paymentRepository = paymentRepository;
+        this.receiptRepository = receiptRepository;
     }
 
     @Override
@@ -48,6 +54,14 @@ public class JpaPaymentRecords implements PaymentRecords {
             return false;
         }
         payment.setStatus(PaymentStatus.valueOf(newStatus));
+        // Confirmed payments always get an official receipt, whichever endpoint confirmed them
+        if (payment.getStatus() == PaymentStatus.CONFIRMED && payment.getReceipt() == null
+                && receiptRepository.findByPaymentId(payment.getId()).isEmpty()) {
+            Receipt receipt = new Receipt(payment, PaymentService.generateReceiptNumber(payment.getId()),
+                    LocalDateTime.now(), payment.getTotalPaid());
+            payment.setReceipt(receipt);
+            receiptRepository.save(receipt);
+        }
         paymentRepository.save(payment);
         return true;
     }
